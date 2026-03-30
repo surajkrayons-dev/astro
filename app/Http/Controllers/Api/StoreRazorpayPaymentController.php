@@ -28,10 +28,12 @@ class StoreRazorpayPaymentController extends Controller
 
             $request->validate([
                 'coupon_code' => 'nullable|string',
-                'wallet_amount' => 'nullable|numeric|min:0'
+                'wallet_amount' => 'nullable|numeric|min:0',
+                'delivery_charge' => 'nullable|numeric|min:0'
             ]);
 
             $walletInput = $request->wallet_amount ?? 0;
+            $deliveryCharge = $request->delivery_charge ?? 0;
 
             // 🔥 CART
             $cart = Cart::where('user_id', $user->id)->firstOrFail();
@@ -86,12 +88,12 @@ class StoreRazorpayPaymentController extends Controller
                 ]);
             }
 
-            if ($walletInput > $afterDiscount) {
-                $walletInput = $afterDiscount;
+            if ($walletInput > ($afterDiscount + $deliveryCharge)) {
+                $walletInput = ($afterDiscount + $deliveryCharge);
             }
 
             $walletUsed = $walletInput;
-            $finalAmount = $afterDiscount - $walletUsed;
+            $finalAmount = max(0, ($afterDiscount + $deliveryCharge) - $walletUsed);
 
             // 🔥 RAZORPAY
             $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
@@ -105,6 +107,7 @@ class StoreRazorpayPaymentController extends Controller
                     'user_id' => $user->id,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
+                    'delivery_charge' => $deliveryCharge,
                     'wallet_used' => $walletUsed,
                     'final_amount' => $finalAmount
                 ]
@@ -116,6 +119,7 @@ class StoreRazorpayPaymentController extends Controller
                 'breakdown' => [
                     'subtotal' => $subtotal,
                     'discount' => $discount,
+                    'delivery_charge' => $deliveryCharge,
                     'wallet_used' => $walletUsed,
                     'final_amount' => $finalAmount
                 ]
@@ -141,7 +145,8 @@ class StoreRazorpayPaymentController extends Controller
             'razorpay_payment_id' => 'nullable',
             'razorpay_signature' => 'nullable',
             'coupon_code' => 'nullable',
-            'wallet_amount' => 'nullable|numeric|min:0'
+            'wallet_amount' => 'nullable|numeric|min:0',
+            'delivery_charge' => 'nullable|numeric|min:0'
         ]);
 
         DB::beginTransaction();
@@ -150,6 +155,7 @@ class StoreRazorpayPaymentController extends Controller
 
             $user = $request->user();
             $walletInput = $request->wallet_amount ?? 0;
+            $deliveryCharge = $request->delivery_charge ?? 0;
 
             // 🔥 CART
             $cart = Cart::where('user_id', $user->id)->firstOrFail();
@@ -201,12 +207,12 @@ class StoreRazorpayPaymentController extends Controller
                 throw new \Exception('Invalid wallet usage');
             }
 
-            if ($walletInput > $afterDiscount) {
-                $walletInput = $afterDiscount;
+            if ($walletInput > ($afterDiscount + $deliveryCharge)) {
+                $walletInput = ($afterDiscount + $deliveryCharge);
             }
 
             $walletUsed = $walletInput;
-            $finalAmount = $afterDiscount - $walletUsed;
+            $finalAmount = max(0, ($afterDiscount + $deliveryCharge) - $walletUsed);
 
             // 🔥 PAYMENT
             $payment = null;
@@ -264,6 +270,7 @@ class StoreRazorpayPaymentController extends Controller
                         'wallet_requested' => $request->wallet_amount,
                         'wallet_used' => $walletUsed,
                         'final_amount' => $finalAmount,
+                        'delivery_charge' => $deliveryCharge,
                         'coupon_code' => $request->coupon_code
                     ],
 
@@ -296,12 +303,14 @@ class StoreRazorpayPaymentController extends Controller
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'wallet_used' => $walletUsed,
+                'delivery_charge' => $deliveryCharge,
                 'paid_amount' => $finalAmount,
-                'total_amount' => $afterDiscount,
+                'total_amount' => ($afterDiscount + $deliveryCharge),
 
                 'price_breakdown' => [
                     'subtotal' => $subtotal,
                     'coupon_discount' => $discount,
+                    'delivery_charge' => $deliveryCharge,
                     'wallet_used' => $walletUsed,
                     'final_payable' => $finalAmount
                 ],
@@ -337,6 +346,7 @@ class StoreRazorpayPaymentController extends Controller
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'wallet_used' => $walletUsed,
+                    'delivery_charge' => $deliveryCharge,
                     'paid_online' => $finalAmount
                 ]
             ]);
