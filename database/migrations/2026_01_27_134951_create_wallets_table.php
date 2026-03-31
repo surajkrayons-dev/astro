@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('total_earned', 12, 2)->default(0);
             $table->decimal('total_withdrawn', 12, 2)->default(0);
 
-            // LAST RECHARGE
+            // LAST RECHARGE FOR USER
             $table->decimal('last_recharge_amount', 12, 2)->default(0);
             $table->timestamp('last_recharge_at')->nullable();
 
