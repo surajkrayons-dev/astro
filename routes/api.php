@@ -137,6 +137,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/create-order', [StoreRazorpayPaymentController::class, 'createOrder']);
         Route::post('/verify-payment', [StoreRazorpayPaymentController::class, 'verify']);
         Route::post('/order/cancel/{id}', [StoreRazorpayPaymentController::class, 'cancelOrder']);
+        Route::get('/order/{id}', [StoreRazorpayPaymentController::class, 'orderDetails']);
     });
 
     /*

@@ -19,16 +19,14 @@ class StoreWallet extends Model
         'balance',
         'total_added',
         'total_spent',
-        'last_recharge_amount',
-        'last_recharge_at',
+        'total_refunded',
     ];
 
     protected $casts = [
         'balance' => 'decimal:2',
         'total_added' => 'decimal:2',
         'total_spent' => 'decimal:2',
-        'last_recharge_amount' => 'decimal:2',
-        'last_recharge_at' => 'datetime',
+        'total_refunded' => 'decimal:2',
     ];
 
     public function user()

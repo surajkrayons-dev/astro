@@ -13,8 +13,10 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Coupon;
 use App\Models\StoreWallet;
+use App\Models\StoreWalletTransaction;
+use App\Models\OrderItemCancellation;
+use App\Models\Coupon;
 
 class StoreRazorpayPaymentController extends Controller
 {
@@ -312,7 +314,8 @@ class StoreRazorpayPaymentController extends Controller
                     'coupon_discount' => $discount,
                     'delivery_charge' => $deliveryCharge,
                     'wallet_used' => $walletUsed,
-                    'final_payable' => $finalAmount
+                    'paid_online' => $finalAmount,
+                    'final_amount' => ($afterDiscount + $deliveryCharge)
                 ],
 
                 'status' => 'paid',
@@ -376,9 +379,9 @@ class StoreRazorpayPaymentController extends Controller
 
             $order = Order::where('id', $id)
                 ->where('user_id', $user->id)
+                ->with('items')
                 ->firstOrFail();
 
-            // ❌ ALREADY CANCELLED
             if ($order->status == 'cancelled') {
                 return response()->json([
                     'status' => false,
@@ -386,7 +389,6 @@ class StoreRazorpayPaymentController extends Controller
                 ]);
             }
 
-            // ❌ NOT ALLOWED
             if (in_array($order->status, ['shipped', 'delivered'])) {
                 return response()->json([
                     'status' => false,
@@ -394,24 +396,59 @@ class StoreRazorpayPaymentController extends Controller
                 ]);
             }
 
-            // 🔥 TOTAL REFUND (IMPORTANT)
             $refundAmount = $order->total_amount;
 
-            // 🔥 WALLET FETCH
+            // 🔥 WALLET
             $wallet = StoreWallet::firstOrCreate(
                 ['user_id' => $user->id],
-                ['balance' => 0, 'total_added' => 0, 'total_spent' => 0]
+                ['balance' => 0, 'total_added' => 0, 'total_spent' => 0, 'total_refunded' => 0]
             );
 
             $before = $wallet->balance;
             $after = $before + $refundAmount;
 
-            // 🔥 UPDATE WALLET
             $wallet->update([
                 'balance' => $after,
-                'total_added' => $wallet->total_added + $refundAmount
+                'total_refunded' => $wallet->total_refunded + $refundAmount
             ]);
 
+            // 🔥 WALLET TRANSACTION
+            StoreWalletTransaction::create([
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'type' => 'credit',
+                'amount' => $refundAmount,
+                'source' => 'order_cancel',
+                'balance_before' => $before,
+                'balance_after' => $after,
+                'note' => 'Order cancelled refund'
+            ]);
+
+            // 🔥 ITEM-WISE REFUND (PROPORTIONAL)
+            $totalOrderAmount = $order->total_amount;
+
+            foreach ($order->items as $item) {
+
+                $itemTotal = $item->total; // ✅ सही column
+
+                $itemRefund = 0;
+
+                if ($totalOrderAmount > 0) {
+                    $itemRefund = ($itemTotal / $totalOrderAmount) * $refundAmount;
+                }
+
+                OrderItemCancellation::create([
+                    'order_id' => $order->id,
+                    'order_item_id' => $item->id,
+                    'user_id' => $user->id,
+                    'quantity' => $item->quantity,
+                    'refund_amount' => round($itemRefund, 2),
+                    'cancelled_at' => now(),
+                    'reason' => 'Order cancelled'
+                ]);
+            }
+
+            // 🔥 PAYMENT UPDATE
             if ($order->payment_id) {
                 Payment::where('id', $order->payment_id)
                     ->update(['payment_status' => 'refunded']);
@@ -427,12 +464,16 @@ class StoreRazorpayPaymentController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Order cancelled & amount refunded to wallet',
+                'message' => 'Order cancelled & refunded',
+
                 'refund' => [
                     'amount' => $refundAmount,
                     'wallet_before' => $before,
                     'wallet_after' => $after
-                ]
+                ],
+
+                // 🔥 ADD THIS
+                'pricing' => $order->price_breakdown
             ]);
 
         } catch (\Exception $e) {
@@ -444,5 +485,25 @@ class StoreRazorpayPaymentController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function orderDetails($id)
+    {
+        $user = auth()->user();
+
+        $order = Order::with('items')
+            ->where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'order_id' => $order->id,
+                'status' => $order->status,
+                'pricing' => $order->price_breakdown,
+                'items' => $order->items
+            ]
+        ]);
     }
 }

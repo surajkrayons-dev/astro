@@ -43,4 +43,9 @@ class OrderItem extends Model
     {
         return $this->hasOne(ReturnRequest::class);
     }
+
+    public function cancellations()
+    {
+        return $this->hasMany(OrderItemCancellation::class);
+    }
 }

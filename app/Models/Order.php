@@ -57,4 +57,14 @@ class Order extends Model
     {
         return $this->belongsTo(Coupon::class);
     }
+
+    public function walletTransactions()
+    {
+        return $this->hasMany(StoreWalletTransaction::class);
+    }
+
+    public function cancellations()
+    {
+        return $this->hasMany(OrderItemCancellation::class);
+    }
 }
