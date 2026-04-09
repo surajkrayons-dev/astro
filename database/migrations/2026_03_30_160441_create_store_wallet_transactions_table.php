@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('payment_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
 
             $table->enum('type', ['credit', 'debit']);

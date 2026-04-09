@@ -60,8 +60,8 @@ return new class extends Migration
 
             /* STATUS */
             $table->boolean('is_online')->default(false)->after('call_price');
-            $table->boolean('is_verified')->default(false)->after('is_online');
-            $table->timestamp('last_seen_at')->nullable()->after('is_verified');
+            $table->boolean('is_busy')->default(false)->after('is_online');
+            $table->timestamp('last_seen_at')->nullable()->after('is_busy');
 
             /* LOCATION */
             $table->unsignedBigInteger('country_id')->nullable()->after('last_seen_at');

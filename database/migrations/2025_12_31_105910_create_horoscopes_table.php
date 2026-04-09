@@ -18,18 +18,25 @@ return new class extends Migration
 
             $table->enum('type', ['today', 'yesterday', 'tomorrow', 'daily', 'weekly', 'monthly', 'yearly']);
 
-            $table->date('date')->nullable(); // daily ke liye
-
             $table->string('title')->nullable();
-            $table->longText('description');
+            $table->longText('overview')->nullable();
 
-            $table->text('love')->nullable();
-            $table->text('career')->nullable();
-            $table->text('health')->nullable();
-            $table->text('finance')->nullable();
+            $table->longText('career')->nullable();
+            $table->json('career_date')->nullable();
+            $table->longText('finance')->nullable();
+            $table->json('finance_date')->nullable();
+            $table->longText('love')->nullable();
+            $table->json('love_date')->nullable();
+            $table->longText('health')->nullable();
+            $table->json('health_date')->nullable();
+            $table->longText('family')->nullable();
+            $table->json('family_date')->nullable();
+            $table->longText('students')->nullable();
+            $table->json('students_date')->nullable();
+            $table->longText('warning')->nullable();
 
-            $table->string('lucky_number')->nullable();
-            $table->string('lucky_color')->nullable();
+            $table->json('lucky_numbers')->nullable();
+            $table->json('lucky_colors')->nullable(); 
 
             $table->boolean('status')->default(1);
             $table->unsignedBigInteger('created_by')->nullable();
@@ -38,8 +45,20 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign Keys
-            $table->foreign('zodiac_id')->references('id')->on('zodiac_signs')->cascadeOnDelete();
-            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('zodiac_id')
+                ->references('id')
+                ->on('zodiac_signs')
+                ->cascadeOnDelete();
+
+            $table->foreign('created_by')
+                ->references('id')
+                ->on('users')
+                ->nullOnDelete();
+
+            $table->foreign('modified_by')
+                ->references('id')
+                ->on('users')
+                ->nullOnDelete();
         });
     }
 

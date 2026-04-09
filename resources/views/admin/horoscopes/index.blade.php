@@ -9,11 +9,11 @@
             <h4 class="mb-sm-0 font-size-18">All Horoscopes</h4>
 
             @if (Can::is_accessible('horoscope', 'create'))
-                <div class="page-title-right">
-                    <a href="{{ route('admin.horoscopes.create') }}" class="btn btn-soft-info">
-                        <i class="fas fa-plus"></i> Create
-                    </a>
-                </div>
+            <div class="page-title-right">
+                <a href="{{ route('admin.horoscopes.create') }}" class="btn btn-soft-info">
+                    <i class="fas fa-plus"></i> Create
+                </a>
+            </div>
             @endif
         </div>
     </div>
@@ -36,10 +36,10 @@
                         <label class="form-label fw-bold">Zodiac</label>
                         <select id="zodiac_id" class="form-control select2-class2" data-placeholder="Select Zodiac">
                             @foreach(\App\Models\ZodiacSign::all() as $zodiac)
-                                <option value=""></option>
-                                <option value="{{ $zodiac->id }}">
-                                    {{ $zodiac->name }}
-                                </option>
+                            <option value=""></option>
+                            <option value="{{ $zodiac->id }}">
+                                {{ $zodiac->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -85,7 +85,6 @@
                         <tr>
                             <th>Zodiac</th>
                             <th>Type</th>
-                            <th>Date</th>
                             <th>Title</th>
                             <th>Status</th>
                             <th width="120">Action</th>
@@ -101,40 +100,86 @@
 
 @section('script')
 <script>
-    $(function () {
+$(function() {
 
-        const reloadTable = () => {
-            $('#data-table').DataTable().ajax.reload();
-        };
+    const reloadTable = () => {
+        $('#data-table').DataTable().ajax.reload();
+    };
 
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('admin.horoscopes.list') }}",
-                data: function (d) {
-                    d.zodiac_id = $('#zodiac_id').val();
-                    d.type = $('#type').val();
-                    d.status = $('#status').val();
+    $('#data-table').on('change', '.change-status', function(e) {
+        e.preventDefault();
+
+        const id = $(this).data("id");
+        const checkbox = $(this);
+        checkbox.prop("disabled", true);
+
+        $.get(`{{ route('admin.horoscopes.change.status') }}/${id}`, function(response) {
+            reloadTable('#data-table');
+            checkbox.prop("disabled", false);
+        }).fail(function() {
+            checkbox.prop("disabled", false);
+        });
+    });
+
+    $('#data-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('admin.horoscopes.list') }}",
+            data: function(d) {
+                d.zodiac_id = $('#zodiac_id').val();
+                d.type = $('#type').val();
+                d.status = $('#status').val();
+            }
+        },
+        columns: [{
+                data: 'zodiac_name',
+                name: 'zodiac.name'
+            },
+            {
+                data: 'type',
+                name: 'type'
+            },
+            {
+                data: 'title',
+                name: 'title',
+                render: function(data, type, row) {
+                    if (!data) return '';
+
+                    let limit = 40;
+
+                    return data.length > limit ?
+                        data.substring(0, limit) + '.......' :
+                        data;
                 }
             },
-            columns: [
-                { data: 'zodiac_name', name: 'zodiac.name' },
-                { data: 'type', name: 'type' },
-                { data: 'date', name: 'date' },
-                { data: 'title', name: 'title' },
-                {
-                    data: 'status_text',
-                    name: 'status',
-                    className: 'text-center'
-                },
-                {
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        return `
+            {
+                data: null,
+                name: 'status',
+                className: 'text-center',
+                mRender: (data, type, row) => {
+                    return `
+                            <div class="square-switch">
+                                <input type="checkbox"
+                                       id="status-switch-${row.id}"
+                                       class="change-status"
+                                       switch="status"
+                                       data-id="${row.id}"
+                                       ${row.status == 1 ? 'checked' : ''} />
+                                <label for="status-switch-${row.id}"
+                                       data-on-label="Yes"
+                                       data-off-label="No"></label>
+                            </div>
+                        `;
+                }
+            },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function(data, type, row) {
+                    return `
                             @if (Can::is_accessible('horoscope', 'update'))
                                 <a href="{{ route('admin.horoscopes.update.index') }}/${row.id}" class="btn btn-soft-info btn-sm waves-effect waves-light"><i class="bx bx-pencil font-size-16"></i></a>
                             @endif
@@ -143,22 +188,22 @@
                                 <button type="button" class="btn btn-soft-danger btn-sm waves-effect waves-light delete-entry" data-href="{{ route("admin.horoscopes.delete") }}/${row.id}" data-tbl="data"><i class="bx bx-trash font-size-16"></i></button>
                             @endif
                         `;
-                    }
                 }
-            ]
-        });
-
-        $('#zodiac_id, #type, #status').on('change', function () {
-            reloadTable();
-        });
-
-        $('#reset-filter-btn').on('click', function () {
-            $('#zodiac_id').val('').trigger('change');
-            $('#type').val('').trigger('change');
-            $('#status').val('1').trigger('change');
-            reloadTable();
-        });
-
+            }
+        ]
     });
+
+    $('#zodiac_id, #type, #status').on('change', function() {
+        reloadTable();
+    });
+
+    $('#reset-filter-btn').on('click', function() {
+        $('#zodiac_id').val('').trigger('change');
+        $('#type').val('').trigger('change');
+        $('#status').val('1').trigger('change');
+        reloadTable();
+    });
+
+});
 </script>
 @endsection

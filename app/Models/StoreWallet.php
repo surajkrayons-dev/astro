@@ -20,6 +20,8 @@ class StoreWallet extends Model
         'total_added',
         'total_spent',
         'total_refunded',
+        'last_recharge_amount',
+        'last_recharge_at',
     ];
 
     protected $casts = [
@@ -27,6 +29,8 @@ class StoreWallet extends Model
         'total_added' => 'decimal:2',
         'total_spent' => 'decimal:2',
         'total_refunded' => 'decimal:2',
+        'last_recharge_amount' => 'decimal:2',
+        'last_recharge_at' => 'datetime',
     ];
 
     public function user()

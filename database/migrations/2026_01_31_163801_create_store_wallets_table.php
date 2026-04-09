@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('total_added', 12, 2)->default(0);
             $table->decimal('total_spent', 12, 2)->default(0);
             $table->decimal('total_refunded', 12, 2)->default(0);
+            $table->decimal('last_recharge_amount', 12, 2)->default(0);
+            $table->timestamp('last_recharge_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

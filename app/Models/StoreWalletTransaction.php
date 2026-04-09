@@ -13,6 +13,7 @@ class StoreWalletTransaction extends Model
 
     protected $fillable = [
         'user_id',
+        'payment_id',
         'order_id',
         'type',
         'amount',

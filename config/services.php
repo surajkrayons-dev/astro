@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'smartflo' => [
+        'caller_id' => env('SMARTFLO_CALLER_ID'),
+    ],
+
 ];

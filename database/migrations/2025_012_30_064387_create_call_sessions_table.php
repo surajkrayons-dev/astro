@@ -16,8 +16,14 @@ return new class extends Migration
             $table->unsignedBigInteger('astrologer_id');
             $table->unsignedBigInteger('user_id');
 
+            $table->string('user_number')->nullable();
+            $table->string('astro_number')->nullable();
+
             $table->timestamp('started_at')->nullable();
             $table->timestamp('ended_at')->nullable();
+            $table->string('call_sid')->nullable();
+            $table->integer('billable_seconds')->nullable();
+            $table->boolean('is_deducted')->default(false);
             $table->integer('duration')->nullable();
             $table->decimal('amount', 10, 2)->default(0);
 

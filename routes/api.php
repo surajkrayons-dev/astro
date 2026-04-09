@@ -13,10 +13,12 @@ use App\Http\Controllers\Api\RazorpayPaymentController;
 use App\Http\Controllers\Api\StoreRazorpayPaymentController;
 use App\Http\Controllers\Api\WalletApiController;
 use App\Http\Controllers\Api\StoreWalletApiController;
+use App\Http\Controllers\Api\StoreWalletTopupController;
 use App\Http\Controllers\Api\UserPaymentAccountApiController;
 use App\Http\Controllers\Api\PayoutRequestApiController;
 use App\Http\Controllers\Api\ChatApiController;
 use App\Http\Controllers\Api\CallApiController;
+use App\Http\Controllers\Api\EasyGoApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\CartApiController;
@@ -35,6 +37,8 @@ use App\Http\Controllers\Api\HoroscopeGenerateController;
 | Public APIs (No Auth Required)
 |--------------------------------------------------------------------------
 */
+
+Route::post('/call/webhook', [EasyGoApiController::class, 'callWebhook']);
 
 // USER AUTH
 Route::prefix('user')->group(function () {
@@ -140,6 +144,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/order/{id}', [StoreRazorpayPaymentController::class, 'orderDetails']);
     });
 
+    Route::post('/wallet/topup/create-order', [StoreWalletTopupController::class, 'createTopupOrder']);
+    Route::post('/wallet/topup/verify', [StoreWalletTopupController::class, 'verifyTopup']);
+
     /*
     |--------------------------------------------------------------------------
     | USER PROTECTED API
@@ -183,14 +190,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('order/place', [OrderApiController::class, 'place']);
             Route::get('orders', [OrderApiController::class, 'index']);
             Route::get('orders/{id}', [OrderApiController::class, 'show']);
-
-            /*
-            |--------------------------------------------------------------------------
-            | PAYMENT APIs
-            |--------------------------------------------------------------------------
-            */  
-            Route::post('payment/initiate', [PurchaseApiController::class, 'initiate']);
-            Route::post('payment/verify', [PurchaseApiController::class, 'verify']); // online payment verification
 
             /*
             |--------------------------------------------------------------------------
@@ -275,6 +274,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/end', [CallApiController::class, 'end']);
         Route::get('/', [CallApiController::class, 'index']);
     });
+    
+    Route::post('/call/initiate', [EasyGoApiController::class, 'initiateCall']);
+    
 
     // Chat
     Route::prefix('chat')->group(function () {

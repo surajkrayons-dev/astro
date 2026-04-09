@@ -57,7 +57,7 @@ class User extends Authenticatable
         'chat_price',
         'call_price',
         'is_online',
-        'is_verified',
+        'is_busy',
         'last_seen_at',
 
         // LOCATION

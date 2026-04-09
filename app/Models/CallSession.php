@@ -14,8 +14,13 @@ class CallSession extends Model
     protected $fillable = [
         'astrologer_id',
         'user_id',
+        'user_number',
+        'astro_number',
         'started_at',
         'ended_at',
+        'call_sid',
+        'billable_seconds',
+        'is_deducted',
         'duration',
         'amount',
         'status',

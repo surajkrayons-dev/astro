@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->unique();
 
             $table->decimal('balance', 12, 2)->default(0);
+            // CALL AMOUNT HOLD DURING CALL
+            $table->decimal('locked_balance', 12, 2)->default(0);
 
             // USER
             $table->decimal('total_added', 12, 2)->default(0);
