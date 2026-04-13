@@ -98,7 +98,25 @@ class StoreRazorpayPaymentController extends Controller
             }
 
             $walletUsed = $walletInput;
+
             $finalAmount = max(0, ($afterDiscount + $deliveryCharge) - $walletUsed);
+
+            // FULL WALLET PAYMENT
+            if ($finalAmount <= 0) {
+
+                return response()->json([
+                    'status' => true,
+                    'payment_mode' => 'wallet_only',
+                    'order_id' => null,
+                    'breakdown' => [
+                        'subtotal' => $subtotal,
+                        'discount' => $discount,
+                        'delivery_charge' => $deliveryCharge,
+                        'wallet_used' => $walletUsed,
+                        'final_amount' => 0
+                    ]
+                ]);
+            }
 
             // 🔥 RAZORPAY
             $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
@@ -147,7 +165,7 @@ class StoreRazorpayPaymentController extends Controller
     public function verify(Request $request)
     {
         $request->validate([
-            'razorpay_order_id' => 'required',
+            'razorpay_order_id' => 'nullable',
             'razorpay_payment_id' => 'nullable',
             'razorpay_signature' => 'nullable',
             'address_id' => 'nullable|exists:alternative_addresses,id',
@@ -220,7 +238,11 @@ class StoreRazorpayPaymentController extends Controller
             $walletUsed = $walletInput;
             $finalAmount = max(0, ($afterDiscount + $deliveryCharge) - $walletUsed);
 
-            // 🔥 PAYMENT
+            if ($finalAmount > 0 && !$request->razorpay_payment_id) {
+                throw new \Exception('Payment required');
+            }
+
+            // PAYMENT
             $payment = null;
             $paymentData = null;
             $paymentMode = 'wallet_only';
@@ -284,20 +306,6 @@ class StoreRazorpayPaymentController extends Controller
                 ]);
             }
 
-            if ($walletUsed > 0) {
-
-                $wallet->refresh();
-
-                if ($wallet->balance < $walletUsed) {
-                    throw new \Exception('Wallet changed, retry');
-                }
-
-                $wallet->update([
-                    'balance' => $wallet->balance - $walletUsed,
-                    'total_spent' => $wallet->total_spent + $walletUsed
-                ]);
-            }
-
             $address = null;
 
             if ($request->address_id) {
@@ -338,6 +346,35 @@ class StoreRazorpayPaymentController extends Controller
                 'status' => 'paid',
                 'paid_at' => now()
             ]);
+
+            // WALLET DEDUCT AFTER ORDER CREATE
+            if ($walletUsed > 0) {
+
+                $wallet->refresh();
+
+                if ($wallet->balance < $walletUsed) {
+                    throw new \Exception('Wallet changed, retry');
+                }
+
+                $before = $wallet->balance;
+                $after = $before - $walletUsed;
+
+                $wallet->update([
+                    'balance' => $after,
+                    'total_spent' => $wallet->total_spent + $walletUsed
+                ]);
+
+                StoreWalletTransaction::create([
+                    'user_id' => $user->id,
+                    'order_id' => $order->id, // ✅ FIXED
+                    'type' => 'debit',
+                    'amount' => $walletUsed,
+                    'source' => 'order_payment',
+                    'balance_before' => $before,
+                    'balance_after' => $after,
+                    'note' => 'Wallet used in order #' . $order->id
+                ]);
+            }
 
                 $productIds = $items->pluck('product_id')->unique();
 

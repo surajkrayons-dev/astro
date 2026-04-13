@@ -26,12 +26,11 @@ class StoreWalletApiController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'balance' => $wallet->balance,
-                'total_added' => $wallet->total_added,
-                'total_spent' => $wallet->total_spent,
-                'total_refunded' => $wallet->total_refunded,
-                'last_recharge_amount' => $wallet->last_recharge_amount,
-                'last_recharge_at' => $wallet->last_recharge_at,
+                'balance' => (int) $wallet->balance,
+                'total_added' => (int) $wallet->total_added,
+                'total_spent' => (int) $wallet->total_spent,
+                'total_refunded' => (int) $wallet->total_refunded,
+                'last_recharge_amount' => (int) $wallet->last_recharge_amount,
             ]
         ]);
     }
@@ -51,6 +50,13 @@ class StoreWalletApiController extends Controller
 
         $transactions = $query->latest()->paginate(10);
 
+        $transactions->getCollection()->transform(function ($item) {
+            $item->amount = (int) $item->amount;
+            $item->balance_before = (int) $item->balance_before;
+            $item->balance_after = (int) $item->balance_after;
+            return $item;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $transactions
@@ -59,69 +65,38 @@ class StoreWalletApiController extends Controller
 
     public function summary()
     {
-        // $wallet = StoreWallet::firstOrCreate(['user_id' => Auth::id()]);
-        $wallet = StoreWallet::where('user_id', Auth::id())
-            ->lockForUpdate()
-            ->firstOrCreate(['user_id' => Auth::id()]);
+        $wallet = StoreWallet::firstOrCreate(['user_id' => Auth::id()]);
 
         return response()->json([
             'success' => true,
             'data' => [
-                'balance' => $wallet->balance ?? 0,
-                'total_added' => $wallet->total_added ?? 0,
-                'total_spent' => $wallet->total_spent ?? 0,
-                'total_refunded' => $wallet->total_refunded ?? 0,
+                'balance' => (int) ($wallet->balance ?? 0),
+                'total_added' => (int) ($wallet->total_added ?? 0),
+                'total_spent' => (int) ($wallet->total_spent ?? 0),
+                'total_refunded' => (int) ($wallet->total_refunded ?? 0),
             ]
         ]);
     }
 
-    public function spendMoney(Request $request)
+    public function spendHistory(Request $request)
     {
-        $request->validate(['amount' => 'required|numeric|min:1']);
+        $transactions = StoreWalletTransaction::with('order')
+            ->where('user_id', Auth::id())
+            ->where('type', 'debit') 
+            ->where('source', 'order_payment')
+            ->latest()
+            ->paginate(10);
 
-        DB::beginTransaction();
+        $transactions->getCollection()->transform(function ($item) {
+            $item->amount = (int) $item->amount;
+            $item->balance_before = (int) $item->balance_before;
+            $item->balance_after = (int) $item->balance_after;
+            return $item;
+        });
 
-        try {
-            $wallet = StoreWallet::where('user_id', Auth::id())
-                ->lockForUpdate()
-                ->firstOrCreate(['user_id' => Auth::id()]);
-
-            if (!$wallet || $wallet->balance < $request->amount) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Insufficient balance'
-                ], 400);
-            }
-
-            $before = $wallet->balance;
-            $after = $before - $request->amount;
-
-            $wallet->update([
-                'balance' => $after,
-                'total_spent' => $wallet->total_spent + $request->amount
-            ]);
-
-            StoreWalletTransaction::create([
-                'user_id' => Auth::id(),
-                'order_id' => $request->order_id ?? null,   
-                'type' => 'debit',
-                'amount' => $request->amount,
-                'source' => 'order_payment',
-                'balance_before' => $before,
-                'balance_after' => $after,
-                'note' => 'Order payment #' . ($request->order_id ?? '')
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'balance' => $after
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
-        }
+        return response()->json([
+            'success' => true,
+            'data' => $transactions
+        ]);
     }
 }
