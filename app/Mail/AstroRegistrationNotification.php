@@ -40,7 +40,7 @@ class AstroRegistrationNotification extends Mailable
                 'category'                 => $this->user->category,
                 'experience'               => $this->user->experience,
                 'expertise'                => $this->user->expertise,
-                'qualification'            => $this->user->qualification,
+                'qualification'            => $this->user->astro_education,
                 'languages'                => $this->user->languages,
                 'daily_available_hours'    => $this->user->daily_available_hours,
                 'is_family_astrologer'     => $this->user->is_family_astrologer,

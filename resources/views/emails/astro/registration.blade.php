@@ -52,7 +52,7 @@
                         </tr>
                         <tr>
                             <th>Qualification</th>
-                            <td>{{ implode(', ', $qualification ?? []) }}</td>
+                            <td>{{ implode(', ', $astro_education ?? []) }}</td>
                         </tr>
                         <tr>
                             <th>Languages</th>
@@ -67,10 +67,10 @@
                             <td>{{ $is_family_astrologer ? 'Yes' : 'No' }}</td>
                         </tr>
                         @if ($is_family_astrologer)
-                            <tr>
-                                <th>Family Astrology Details</th>
-                                <td>{{ $family_astrology_details }}</td>
-                            </tr>
+                        <tr>
+                            <th>Family Astrology Details</th>
+                            <td>{{ $family_astrology_details }}</td>
+                        </tr>
                         @endif
                         <tr>
                             <th>Status</th>
@@ -98,7 +98,7 @@
     </div>
 
     <script>
-        console.log("Admin Registration Notification Loaded");
+    console.log("Admin Registration Notification Loaded");
     </script>
 
 </body>
