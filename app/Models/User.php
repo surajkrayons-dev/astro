@@ -284,7 +284,7 @@ class User extends Authenticatable
 
             if ($user->role_id == 2 && $user->status == 0) {
 
-                \Mail::to('mail@astrotring.com')
+                \Mail::to('no-reply@astrotring.com')
                     ->send(new \App\Mail\AstroRegistrationNotification($user));
             }
         });

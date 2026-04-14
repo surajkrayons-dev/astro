@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderThankYouMail;
+use App\Mail\OrderDetailsMail;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
@@ -72,5 +76,41 @@ class Order extends Model
     public function cancellations()
     {
         return $this->hasMany(OrderItemCancellation::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($order) {
+
+            DB::afterCommit(function () use ($order) {
+
+                try {
+
+                    $order = $order->fresh()->load([
+                        'user',
+                        'items.product', 
+                        'payment'
+                    ]);
+
+                    if (!$order->user || !$order->user->email) {
+                        \Log::error('User email missing');
+                        return;
+                    }
+
+                    Mail::to($order->user->email)
+                        ->send(new \App\Mail\OrderThankYouMail($order));
+
+                    Mail::to($order->user->email)
+                        ->send(new \App\Mail\OrderDetailsMail($order));
+
+                } catch (\Exception $e) {
+                    \Log::error('Order Mail Failed', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+
+            });
+
+        });
     }
 }
