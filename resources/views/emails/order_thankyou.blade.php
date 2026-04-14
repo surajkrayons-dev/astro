@@ -27,7 +27,7 @@
                         <td style="padding:20px;text-align:center;">
                             <h2 style="margin:0;color:#e65100;">🎉 Order Confirmed</h2>
                             <p style="color:#555;font-size:14px;">
-                                Hi <b>{{ $order->name ?? $order->user->name }}</b>,<br>
+                                Hi <b>{{ $order->user->name ?? 'User' }}</b>,<br>
                                 Thank you for buying from <b>Astrotring Store</b> 🙏<br>
                                 Your order has been successfully placed.
                             </p>

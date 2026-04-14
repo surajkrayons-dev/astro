@@ -24,7 +24,7 @@
                     <!-- USER -->
                     <tr>
                         <td style="padding:18px;font-size:14px;">
-                            Hi <b>{{ $order->user->name }}</b>,<br>
+                            Hi <b>{{ $order->user->name ?? 'User' }}</b>,<br>
                             Here’s everything about your order 👇
                         </td>
                     </tr>
