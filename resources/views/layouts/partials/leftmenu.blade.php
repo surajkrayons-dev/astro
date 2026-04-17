@@ -1,198 +1,365 @@
+@php
+$user = auth()->user();
+@endphp
+
 <div class="vertical-menu">
     <div data-simplebar class="h-100">
         <div id="sidebar-menu">
             <ul class="metismenu list-unstyled" id="side-menu">
 
-                @if (auth()->check() && auth()->user()->isSuperAdmin())
-                    <li>
-                        <a href="{{ route('admin.dashboard.index') }}" class="waves-effect">
-                            <i class="bx bx-home-circle"></i>
-                            <span key="t-chat">Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.dashboard.index') }}" class="waves-effect">
-                            <i class="bx bx-rupee"></i>
-                            <span key="t-chat">Earned</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.interactions.index') }}" class="waves-effect">
-                            <i class="bx bx-transfer"></i>
-                            <span key="t-chat">Interactions</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.product_stocks.index') }}" class="waves-effect">
-                            <i class="bx bx-package"></i>
-                            <span key="t-chat">Product Stock</span>
-                        </a>
-                    </li>
+                {{-- ================= ADMIN ================= --}}
+                @if($user && $user->isSuperAdmin())
 
-                    <li class="menu-title" key="t-menu">HOROSCOPE MAINTENANCE</li>
+                <li>
+                    <a href="{{ route('admin.dashboard.index') }}">
+                        <i class="bx bx-home-circle"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
 
-                    <li>
-                        <a href="{{ route('admin.zodiac_signs.index') }}">
-                            <i class="bx bx-wind"></i>
-                            <span>Zodiac Signs</span>
-                        </a>
-                    </li>
+                <li>
+                    <a href="{{ route('admin.interactions.index') }}">
+                        <i class="bx bx-transfer"></i>
+                        <span>Interactions</span>
+                    </a>
+                </li>
 
-                    <li>
-                        <a href="{{ route('admin.horoscopes.index') }}">
-                            <i class="bx bx-star"></i>
-                            <span>Horoscope</span>
-                        </a>
-                    </li>
+                <li>
+                    <a href="{{ route('admin.product_stocks.index') }}">
+                        <i class="bx bx-package"></i>
+                        <span>Product Stock</span>
+                    </a>
+                </li>
 
-                    <li class="menu-title" key="t-menu">Astrologers & Users</li>
-                    <li>
-                        <a href="{{ route('admin.astrologers.index') }}" class="waves-effect">
-                            <i class="bx bx-user-circle"></i>
-                            <span key="t-chat">Astrologers</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.users.index') }}" class="waves-effect">
-                            <i class="bx bx-group"></i>
-                            <span key="t-chat">Users</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.payouts.index') }}" class="waves-effect">
-                            <i class="bx bx-money"></i>
-                            <span key="t-chat">Payout Requests</span>
-                        </a>
-                    </li>
+                <li class="menu-title">PERMISSIONS</li>
+                <li>
+                    <a href="{{ route('admin.permissions.index') }}">
+                        <i class="bx bx-lock-alt"></i>
+                        <span>Permission</span>
+                    </a>
+                </li>
 
-                    <li class="menu-title" key="t-menu">Blog</li>
-                    <li>
-                        <a href="{{ route('admin.blog_categories.index') }}" class="waves-effect">
-                            <i class="bx bx-layer"></i>
-                            <span key="t-chat">Blog Category</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.blogs.index') }}" class="waves-effect">
-                            <i class="bx bx-list-ul"></i>
-                            <span key="t-chat">Blog</span>
-                        </a>
-                    </li>
+                <li class="menu-title">HOROSCOPE</li>
 
-                    <li class="menu-title" key="t-menu">Coupons & Products</li>
-                    <li>
-                        <a href="{{ route('admin.coupons.index') }}" class="waves-effect">
-                            <i class="bx bxs-discount"></i>
-                            <span key="t-chat">Coupon</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.product_categories.index') }}" class="waves-effect">
-                            <i class="bx bx-box"></i>
-                            <span key="t-chat">Product Category</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.products.index') }}" class="waves-effect">
-                            <i class="bx bx-collection"></i>
-                            <span key="t-chat">Product</span>
-                        </a>
-                    </li>
+                <li>
+                    <a href="{{ route('admin.zodiac_signs.index') }}">
+                        <i class="bx bx-wind"></i>
+                        <span>Zodiac Signs</span>
+                    </a>
+                </li>
 
-                    <li class="menu-title" key="t-menu">ORDERS & RETURNS</li>
-                    <li>
-                        <a href="{{ route('admin.orders.index') }}" class="waves-effect">
-                            <i class="bx bx-cart"></i>
-                            <span key="t-chat">Orders</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.returns.index') }}" class="waves-effect">
-                            <i class="bx bx-undo"></i>
-                            <span key="t-chat">Returns</span>
-                        </a>
-                    </li>
+                <li>
+                    <a href="{{ route('admin.horoscopes.index') }}">
+                        <i class="bx bx-star"></i>
+                        <span>Horoscope</span>
+                    </a>
+                </li>
 
-                    <li class="menu-title" key="t-menu">Banners</li>
-                    <li>
-                        <a href="{{ route('admin.astro_banners.index') }}" class="waves-effect">
-                            <i class="bx bx-image"></i>
-                            <span key="t-chat">Astro Banner</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.store_banners.index') }}" class="waves-effect">
-                            <i class="bx bx-store"></i>
-                            <span key="t-chat">Store Banner</span>
-                        </a>
-                    </li>
+                <li class="menu-title">USERS</li>
+                <li>
+                    <a href="{{ route('admin.astrologers.index') }}" class="waves-effect">
+                        <i class="bx bx-user-circle"></i>
+                        <span key="t-chat">Astrologers</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.users.index') }}">
+                        <i class="bx bx-user"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.payouts.index') }}">
+                        <i class="bx bx-wallet"></i>
+                        <span>Payout Requests</span>
+                    </a>
+                </li>
 
-                    <li>
-                        <a href="{{ route('admin.send_mail.index') }}" class="waves-effect">
-                            <i class="bx bx-envelope"></i>
-                            <span>Send Mail</span>
-                        </a>
-                    </li>
+                <li class="menu-title">BLOG</li>
+
+                <li>
+                    <a href="{{ route('admin.blog_categories.index') }}">
+                        <i class="bx bx-layer"></i>
+                        <span>Blog Category</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.blogs.index') }}">
+                        <i class="bx bx-list-ul"></i>
+                        <span>Blog</span>
+                    </a>
+                </li>
+
+                <li class="menu-title">Coupons & PRODUCTS</li>
+
+                <li>
+                    <a href="{{ route('admin.coupons.index') }}">
+                        <i class="bx bxs-discount"></i>
+                        <span>Coupons</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.product_categories.index') }}">
+                        <i class="bx bx-box"></i>
+                        <span>Product Category</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.products.index') }}">
+                        <i class="bx bx-collection"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+
+                <li class="menu-title">ORDERS & RETURNS</li>
+
+                <li>
+                    <a href="{{ route('admin.orders.index') }}">
+                        <i class="bx bx-cart"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.returns.index') }}">
+                        <i class="bx bx-undo"></i>
+                        <span>Returns</span>
+                    </a>
+                </li>
+
+                <li class="menu-title">BANNERS</li>
+
+                <li>
+                    <a href="{{ route('admin.astro_banners.index') }}">
+                        <i class="bx bx-image"></i>
+                        <span>Astro Banner</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.store_banners.index') }}">
+                        <i class="bx bx-images"></i>
+                        <span>Store Banner</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.send_mail.index') }}">
+                        <i class="bx bx-envelope"></i>
+                        <span>Send Mail</span>
+                    </a>
+                </li>
+
+                {{-- ================= EMPLOYEE ================= --}}
+                @elseif($user)
+
+                @if($user->hasAccess('dashboard'))
+                <li>
+                    <a href="{{ route('admin.dashboard.index') }}">
+                        <i class="bx bx-home-circle"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
                 @endif
 
-                <!--@if (auth()->check() && auth()->user()->isAstro())
--->
+                @if($user->hasAccess('earned'))
+                <li>
+                    <a href="{{ route('admin.dashboard.index') }}">
+                        <i class="bx bx-rupee"></i>
+                        <span>Earned</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li class="menu-title">ASTROLOGER PANEL</li>-->
+                @if($user->hasAccess('interactions'))
+                <li>
+                    <a href="{{ route('admin.interactions.index') }}">
+                        <i class="bx bx-transfer"></i>
+                        <span>Interactions</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="{{ route('astro.dashboard.index') }}">-->
-                <!--            <i class="bx bx-home-circle"></i>-->
-                <!--            <span>Dashboard</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                @if($user->hasAccess('product_stocks'))
+                <li>
+                    <a href="{{ route('admin.product_stocks.index') }}">
+                        <i class="bx bx-package"></i>
+                        <span>Product Stock</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="#">-->
-                <!--            <i class="bx bx-time"></i>-->
-                <!--            <span>Availability</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                {{-- HOROSCOPE --}}
+                @if($user->hasAccess('zodiac_signs') || $user->hasAccess('horoscopes'))
+                <li class="menu-title">HOROSCOPE MAINTENANCE</li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="#">-->
-                <!--            <i class="bx bx-message-rounded-dots"></i>-->
-                <!--            <span>Chat Requests</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                @if($user->hasAccess('zodiac_signs'))
+                <li>
+                    <a href="{{ route('admin.zodiac_signs.index') }}">
+                        <i class="bx bx-wind"></i>
+                        <span>Zodiac Signs</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="#">-->
-                <!--            <i class="bx bx-phone-call"></i>-->
-                <!--            <span>Call Requests</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                @if($user->hasAccess('horoscopes'))
+                <li>
+                    <a href="{{ route('admin.horoscopes.index') }}">
+                        <i class="bx bx-star"></i>
+                        <span>Horoscope</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="#">-->
-                <!--            <i class="bx bxs-wallet"></i>-->
-                <!--            <span>Wallet / Earnings</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                {{-- USERS --}}
+                @if($user->hasAccess('astrologers') || $user->hasAccess('users') || $user->hasAccess('payouts'))
+                <li class="menu-title">Astrologers & Users</li>
+                @endif
 
-                <!--    <li class="menu-title">REPORTS</li>-->
+                @if($user->hasAccess('astrologers'))
+                <li>
+                    <a href="{{ route('admin.astrologers.index') }}">
+                        <i class="bx bx-user-circle"></i>
+                        <span>Astrologers</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="#">-->
-                <!--            <i class="bx bx-history"></i>-->
-                <!--            <span>Consultation History</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                @if($user->hasAccess('users'))
+                <li>
+                    <a href="{{ route('admin.users.index') }}">
+                        <i class="bx bx-group"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--    <li>-->
-                <!--        <a href="#">-->
-                <!--            <i class="bx bxs-star"></i>-->
-                <!--            <span>Ratings & Reviews</span>-->
-                <!--        </a>-->
-                <!--    </li>-->
+                @if($user->hasAccess('payouts'))
+                <li>
+                    <a href="{{ route('admin.payouts.index') }}">
+                        <i class="bx bx-money"></i>
+                        <span>Payout Requests</span>
+                    </a>
+                </li>
+                @endif
 
-                <!--
-@endif-->
+                {{-- BLOG --}}
+                @if($user->hasAccess('blog_categories') || $user->hasAccess('blogs'))
+                <li class="menu-title">Blog</li>
+                @endif
+
+                @if($user->hasAccess('blog_categories'))
+                <li>
+                    <a href="{{ route('admin.blog_categories.index') }}">
+                        <i class="bx bx-layer"></i>
+                        <span>Blog Category</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->hasAccess('blogs'))
+                <li>
+                    <a href="{{ route('admin.blogs.index') }}">
+                        <i class="bx bx-list-ul"></i>
+                        <span>Blog</span>
+                    </a>
+                </li>
+                @endif
+
+                {{-- PRODUCTS --}}
+                @if($user->hasAccess('coupons') || $user->hasAccess('product_categories') ||
+                $user->hasAccess('products'))
+                <li class="menu-title">Coupons & Products</li>
+                @endif
+
+                @if($user->hasAccess('coupons'))
+                <li>
+                    <a href="{{ route('admin.coupons.index') }}">
+                        <i class="bx bxs-discount"></i>
+                        <span>Coupon</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->hasAccess('product_categories'))
+                <li>
+                    <a href="{{ route('admin.product_categories.index') }}">
+                        <i class="bx bx-box"></i>
+                        <span>Product Category</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->hasAccess('products'))
+                <li>
+                    <a href="{{ route('admin.products.index') }}">
+                        <i class="bx bx-collection"></i>
+                        <span>Product</span>
+                    </a>
+                </li>
+                @endif
+
+                {{-- ORDERS --}}
+                @if($user->hasAccess('orders') || $user->hasAccess('returns'))
+                <li class="menu-title">ORDERS & RETURNS</li>
+                @endif
+
+                @if($user->hasAccess('orders'))
+                <li>
+                    <a href="{{ route('admin.orders.index') }}">
+                        <i class="bx bx-cart"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->hasAccess('returns'))
+                <li>
+                    <a href="{{ route('admin.returns.index') }}">
+                        <i class="bx bx-undo"></i>
+                        <span>Returns</span>
+                    </a>
+                </li>
+                @endif
+
+                {{-- BANNERS --}}
+                @if($user->hasAccess('astro_banners') || $user->hasAccess('store_banners') ||
+                $user->hasAccess('send_mail'))
+                <li class="menu-title">Banners</li>
+                @endif
+
+                @if($user->hasAccess('astro_banners'))
+                <li>
+                    <a href="{{ route('admin.astro_banners.index') }}">
+                        <i class="bx bx-image"></i>
+                        <span>Astro Banner</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->hasAccess('store_banners'))
+                <li>
+                    <a href="{{ route('admin.store_banners.index') }}">
+                        <i class="bx bx-store"></i>
+                        <span>Store Banner</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->hasAccess('send_mail'))
+                <li>
+                    <a href="{{ route('admin.send_mail.index') }}">
+                        <i class="bx bx-envelope"></i>
+                        <span>Send Mail</span>
+                    </a>
+                </li>
+                @endif
+
+                @endif
 
             </ul>
         </div>

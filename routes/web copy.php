@@ -48,7 +48,7 @@ Route::namespace('App\Http\Controllers\Admin')
     ->group(function () {
 
         // Secured Routes
-        Route::middleware(['auth', 'employee'])
+        Route::middleware('auth')
             ->group(function () {
                 Route::prefix('dashboard')
                     ->name('dashboard.')
@@ -70,17 +70,6 @@ Route::namespace('App\Http\Controllers\Admin')
                         Route::post('/', 'ProfileController@postUpdate')->name('update');
                         Route::post('/change_password', 'ProfileController@postChangePassword')->name('change.password');
                         Route::get('/logout', 'ProfileController@getLogout')->name('logout');
-                    });
-
-                Route::prefix('permissions')
-                    ->name('permissions.')
-                    ->group(function () {
-
-                        Route::get('/', 'PermissionController@getIndex')->name('index');
-                        Route::get('list', 'PermissionController@getList')->name('list');
-                        
-                        Route::get('update/{id}', 'PermissionController@getUpdate')->name('update.index');
-                        Route::post('update/{id}', 'PermissionController@postUpdate')->name('update');
                     });
 
                 Route::prefix('zodiac_signs')
@@ -472,6 +461,177 @@ Route::namespace('App\Http\Controllers\Admin')
                     ->group(function () {
                         Route::get('/', 'MailController@getIndex')->name('index');
                         Route::post('/send', 'MailController@sendMail')->name('send');
+                    });
+            });
+    });
+
+Route::namespace('App\Http\Controllers\Astro')
+    ->prefix('astro')
+    ->name('astro.')
+    ->middleware('auth')
+    ->group(function () {
+
+        // Dashboard
+        Route::prefix('dashboard')
+            ->name('dashboard.')
+            ->group(function () {
+                Route::get('/', 'DashboardController@getIndex')->name('index');
+                Route::get('/stats', 'DashboardController@getStats')->name('stats');
+                Route::get('/orders/graph', 'DashboardController@getOrdersGraph')->name('orders.graph');
+                Route::get('/login/requested', 'DashboardController@getLoginRequested')->name('login.requested');
+                Route::get('/login/request/status', 'DashboardController@getLoginRequestStatus')->name('login.request.status');
+            });
+
+        // Profile
+        Route::prefix('profile')
+            ->name('profile.')
+            ->group(function () {
+                Route::get('/', 'UserController@getIndex')->name('details');
+                Route::post('/', 'UserController@postUpdate')->name('update');
+                Route::post('/change_password', 'UserController@postChangePassword')->name('change.password');
+                Route::get('/logout', 'UserController@getLogout')->name('logout');
+            });
+
+        Route::prefix('stores')
+            ->name('stores.')
+            ->group(function () {
+                Route::get('/', 'StoreController@getIndex')->name('index');
+                Route::get('list', 'StoreController@getList')->name('list');
+                Route::get('get-states/{country_id}', 'StoreController@getStatesByCountry')->name('get.states');
+                Route::get('get-cities/{state_id}', 'StoreController@getCitiesByState')->name('get.cities');
+                Route::get('create', 'StoreController@getCreate')->name('create.index');
+                Route::post('create', 'StoreController@postCreate')->name('create');
+                Route::get('update/{id?}', 'StoreController@getUpdate')->name('update.index');
+                Route::post('update/{id?}', 'StoreController@postUpdate')->name('update');
+                Route::get('view/{id?}', 'StoreController@getView')->name('view');
+                Route::get('delete/{id?}', 'StoreController@getDelete')->name('delete');
+                Route::get('change/status/{id?}', 'StoreController@getChangeStatus')->name('change.status');
+
+                Route::prefix('import')
+                    ->name('import.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'StoreController@getXlsxImport')->name('index');
+                        Route::get('download/sample', 'StoreController@getXlsxImportSampleDownload')->name('download.sample');
+                        Route::post('/', 'StoreController@postXlsxImport')->name('data');
+                    });
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'StoreController@exportXlsx')->name('data');
+                    });
+            });
+
+        Route::prefix('products')
+            ->name('products.')
+            ->group(function () {
+                Route::get('/', 'ProductController@getIndex')->name('index');
+                Route::get('list', 'ProductController@getList')->name('list');
+                Route::get('create', 'ProductController@getCreate')->name('create.index');
+                Route::post('create', 'ProductController@postCreate')->name('create');
+                Route::get('update/{id?}', 'ProductController@getUpdate')->name('update.index');
+                Route::post('update/{id?}', 'ProductController@postUpdate')->name('update');
+                Route::get('delete/{id?}', 'ProductController@getDelete')->name('delete');
+                // Route::get('update/in_stock/{id?}', 'ProductController@getChangeInStock')->name('change.in_stock');
+                // Route::get('update/is_published/{id?}', 'ProductController@getChangeIsPublished')->name('change.is_published');
+                Route::get('update/status/{id?}', 'ProductController@getChangeStatus')->name('change.status');
+                Route::get('view/{id?}', 'ProductController@getView')->name('view');
+
+                Route::prefix('import')
+                    ->name('import.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'ProductController@getXlsxImport')->name('index');
+                        Route::get('download/sample', 'ProductController@getXlsxImportSampleDownload')->name('download.sample');
+                        Route::post('/', 'ProductController@postXlsxImport')->name('data');
+                    });
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'ProductController@exportXlsx')->name('data');
+                    });
+            });
+
+        Route::prefix('payout_clients')
+            ->name('payout_clients.')
+            ->group(function () {
+                Route::get('/', 'PayoutClientController@getIndex')->name('index');
+                Route::get('list', 'PayoutClientController@getList')->name('list');
+                Route::get('update/{id?}', 'PayoutClientController@getUpdate')->name('update.index');
+                Route::post('update/{id?}', 'PayoutClientController@postUpdate')->name('update');
+                Route::get('delete/{id?}', 'PayoutClientController@getDelete')->name('delete');
+                Route::get('view/{id?}', 'PayoutClientController@getView')->name('view');
+                Route::get('change/status/{id?}', 'PayoutClientController@getChangeStatus')->name('change.status');
+                Route::get('invoice/{id?}', 'PayoutClientController@getInvoice')->name('invoice');
+            });
+
+        Route::prefix('sale_reports')
+            ->name('sale_reports.')
+            ->group(function () {
+                Route::get('/', 'SaleReportController@getIndex')->name('index');
+                Route::get('list', 'SaleReportController@getList')->name('list');
+                Route::get('view/{id?}', 'SaleReportController@getView')->name('view');
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'SaleReportController@exportXlsx')->name('data');
+                    });
+            });
+
+        Route::prefix('visibility_reports')
+            ->name('visibility_reports.')
+            ->group(function () {
+                Route::get('/', 'VisibilityReportController@getIndex')->name('index');
+                Route::get('list', 'VisibilityReportController@getList')->name('list');
+                Route::get('view/{id?}', 'VisibilityReportController@getView')->name('view');
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'VisibilityReportController@exportXlsx')->name('data');
+                    });
+            });
+
+        Route::prefix('competition_benchmarking_reports')
+            ->name('competition_benchmarking_reports.')
+            ->group(function () {
+                Route::get('/', 'CompetitionBenchmarkingReportController@getIndex')->name('index');
+                Route::get('list', 'CompetitionBenchmarkingReportController@getList')->name('list');
+                Route::get('view/{id?}', 'CompetitionBenchmarkingReportController@getView')->name('view');
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'CompetitionBenchmarkingReportController@exportXlsx')->name('data');
+                    });
+            });
+
+        Route::prefix('promotion_tracking_reports')
+            ->name('promotion_tracking_reports.')
+            ->group(function () {
+                Route::get('/', 'PromotionTrackingReportController@getIndex')->name('index');
+                Route::get('list', 'PromotionTrackingReportController@getList')->name('list');
+                Route::get('view/{id?}', 'PromotionTrackingReportController@getView')->name('view');
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'PromotionTrackingReportController@exportXlsx')->name('data');
+                    });
+            });
+
+        Route::prefix('category_tracking_reports')
+            ->name('category_tracking_reports.')
+            ->group(function () {
+                Route::get('/', 'CategoryTrackingReportController@getIndex')->name('index');
+                Route::get('list', 'CategoryTrackingReportController@getList')->name('list');
+                Route::get('view/{id?}', 'CategoryTrackingReportController@getView')->name('view');
+
+                Route::prefix('export')
+                    ->name('export.xlsx.')
+                    ->group(function () {
+                        Route::get('/', 'CategoryTrackingReportController@exportXlsx')->name('data');
                     });
             });
     });

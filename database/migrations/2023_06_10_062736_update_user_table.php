@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
 
             /* BASIC */
-            $table->enum('type', ['admin', 'astro', 'user'])->after('id');
+            $table->enum('type', ['admin', 'astro', 'user', 'employee'])->after('id');
             $table->unsignedBigInteger('role_id')->after('type');
+            $table->json('permissions')->nullable()->after('role_id');
             $table->string('username')->unique()->after('role_id');
             $table->string('code')->unique()->nullable()->after('username');
 

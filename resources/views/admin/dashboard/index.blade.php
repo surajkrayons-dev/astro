@@ -5,7 +5,7 @@
 @section('content')
 <div class="row mb-3">
     <div class="col-12 d-flex justify-content-between align-items-center">
-        <h4>Admin Dashboard</h4>
+        <h4>Dashboard</h4>
     </div>
 </div>
 
@@ -78,7 +78,6 @@
 
 @section('script')
 <script>
-
 let datePickerRanges = {
     'Today': [moment(), moment()],
     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -108,7 +107,7 @@ let datePickerLocale = {
 };
 
 let start = moment().subtract(6, 'days');
-let end   = moment();
+let end = moment();
 
 $('#dashboard_date_range').daterangepicker({
     startDate: start,
@@ -120,12 +119,18 @@ $('#dashboard_date_range').daterangepicker({
 
 const growthChart = new Chart(document.getElementById('growthChart'), {
     type: 'line',
-    data: { labels: [], datasets: [] }
+    data: {
+        labels: [],
+        datasets: []
+    }
 });
 
 const engagementChart = new Chart(document.getElementById('engagementChart'), {
     type: 'line',
-    data: { labels: [], datasets: [] }
+    data: {
+        labels: [],
+        datasets: []
+    }
 });
 
 
@@ -141,18 +146,32 @@ function loadGraphs(start, end) {
 
     $.get('{{ route("admin.dashboard.graph.growth") }}', params, res => {
         growthChart.data.labels = res.labels;
-        growthChart.data.datasets = [
-            { label: 'Astrologers', data: res.astrologers, borderWidth: 2 },
-            { label: 'Users', data: res.customers, borderWidth: 2 }
+        growthChart.data.datasets = [{
+                label: 'Astrologers',
+                data: res.astrologers,
+                borderWidth: 2
+            },
+            {
+                label: 'Users',
+                data: res.customers,
+                borderWidth: 2
+            }
         ];
         growthChart.update();
     });
 
     $.get('{{ route("admin.dashboard.graph.engagement") }}', params, res => {
         engagementChart.data.labels = res.labels;
-        engagementChart.data.datasets = [
-            { label: 'Call', data: res.calls, borderWidth: 2 },
-            { label: 'Chat', data: res.chats, borderWidth: 2 }
+        engagementChart.data.datasets = [{
+                label: 'Call',
+                data: res.calls,
+                borderWidth: 2
+            },
+            {
+                label: 'Chat',
+                data: res.chats,
+                borderWidth: 2
+            }
         ];
         engagementChart.update();
     });
@@ -169,6 +188,5 @@ function loadStats() {
 
 // INITIAL LOAD
 loadGraphs(start, end);
-
 </script>
 @endsection

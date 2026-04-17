@@ -41,15 +41,10 @@
                         class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Profile</span></a>
                     --}}
 
-                    @if(Auth::user()->role_id == 1)
-                    <a class="dropdown-item" href="{{route('admin.profile.details')}}"><i
-                            class="bx bx-user font-size-16 align-middle me-1"></i> <span
-                            key="t-profile">Profile</span></a>
-                    @else
-                    <a class="dropdown-item" href="{{route('astro.profile.details')}}"><i
-                            class="bx bx-user font-size-16 align-middle me-1"></i> <span
-                            key="t-profile">Profile</span></a>
-                    @endif
+                    <a class="dropdown-item" href="{{ route('admin.profile.details') }}">
+                        <i class="bx bx-user font-size-16 align-middle me-1"></i>
+                        <span key="t-profile">Profile</span>
+                    </a>
 
                     @if (Can::is_accessible('system_settings'))
                     <a class="dropdown-item d-block" href="{{ route('admin.settings.index') }}"><i

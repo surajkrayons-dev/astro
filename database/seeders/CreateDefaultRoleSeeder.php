@@ -32,5 +32,12 @@ class CreateDefaultRoleSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        \DB::table('roles')->insert([
+            'name' => 'Employee',
+            'is_delete_allowed' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

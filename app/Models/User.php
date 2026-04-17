@@ -36,6 +36,7 @@ class User extends Authenticatable
         // ROLE & ACCESS
         'type',
         'role_id',
+        'permissions',
         'parent_id',
         'status',
         "terms_accepted",
@@ -126,6 +127,11 @@ class User extends Authenticatable
     public function isAstro()
     {
         return $this->type === 'astro';
+    }
+
+    public function isEmployee()
+    {
+        return $this->type === 'employee';
     }
 
     /* =====================================================
@@ -297,5 +303,12 @@ class User extends Authenticatable
                     ->send(new \App\Mail\AstroApprovedMail($user));
             }
         });
+    }
+
+    public function hasAccess($module)
+    {
+        $permissions = json_decode($this->permissions ?? '[]', true);
+
+        return in_array($module, $permissions);
     }
 }

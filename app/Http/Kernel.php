@@ -36,7 +36,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\IsStaffLoginVerified::class,
+            // \App\Http\Middleware\IsStaffLoginVerified::class,
         ],
 
         'api' => [
@@ -66,5 +66,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'astro' => \App\Http\Middleware\EnsureAstro::class,
         'user'  => \App\Http\Middleware\EnsureUser::class,
+        'employee' => \App\Http\Middleware\EmployeeMiddleware::class,
     ];
 }
