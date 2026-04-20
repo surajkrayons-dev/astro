@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderThankYouMail;
 use App\Mail\OrderDetailsMail;
+use App\Mail\OrderDeliveredMail;
+use App\Mail\OrderCancelledMail;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
@@ -120,43 +122,55 @@ class Order extends Model
 
         static::updated(function ($order) {
 
-            if (
-                $order->isDirty('status') &&
-                $order->getOriginal('status') != 'cancelled' &&
-                $order->status == 'cancelled'
-            ) {
+            if (!$order->isDirty('status')) {
+                return;
+            }
 
-                DB::afterCommit(function () use ($order) {
+            DB::afterCommit(function () use ($order) {
 
-                    try {
+                try {
 
-                        $order = $order->fresh()->load([
-                            'user',
-                            'items.product',
-                            'payment',
-                            'walletTransactions'
-                        ]);
+                    $order = $order->fresh()->load([
+                        'user',
+                        'items.product',
+                        'payment',
+                        'walletTransactions'
+                    ]);
 
-                        if (!$order->user || !$order->user->email) {
-                            \Log::error('User email missing for cancel mail');
-                            return;
-                        }
+                    if (!$order->user || !$order->user->email) {
+                        \Log::error('User email missing');
+                        return;
+                    }
 
+                    // ✅ DELIVERED
+                    if (
+                        $order->getOriginal('status') != 'delivered' &&
+                        $order->status == 'delivered'
+                    ) {
+                        Mail::to($order->user->email)
+                            ->send(new \App\Mail\OrderDeliveredMail($order));
+
+                        \Log::info('Delivered mail sent', ['order_id' => $order->id]);
+                    }
+
+                    // ✅ CANCELLED
+                    if (
+                        $order->getOriginal('status') != 'cancelled' &&
+                        $order->status == 'cancelled'
+                    ) {
                         Mail::to($order->user->email)
                             ->send(new \App\Mail\OrderCancelledMail($order));
 
-                        \Log::info('Cancel mail sent', [
-                            'order_id' => $order->id
-                        ]);
-
-                    } catch (\Exception $e) {
-                        \Log::error('Cancel Mail Failed', [
-                            'error' => $e->getMessage()
-                        ]);
+                        \Log::info('Cancel mail sent', ['order_id' => $order->id]);
                     }
 
-                });
-            }
+                } catch (\Exception $e) {
+                    \Log::error('Order Mail Failed', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+
+            });
         });
     }
 }
