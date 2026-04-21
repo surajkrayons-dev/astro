@@ -25,7 +25,7 @@ class AlternativeAddressApiController extends Controller
     {
         $request->validate([
             'name'               => 'required|string|max:255',
-            'gmail'             => 'nullable|email|max:255',
+            'email'             => 'nullable|email|max:255',
             'country_code'       => 'required|string|max:5',
             'mobile'             => 'required|string|max:20',
             'alternative_mobile' => 'nullable|string|max:20',
@@ -38,7 +38,7 @@ class AlternativeAddressApiController extends Controller
 
         $address = AlternativeAddress::create([
             'user_id'            => $request->user()->id,
-            'gmail'              => $request->gmail,
+            'email'              => $request->email,
             'name'               => $request->name,
             'country_code'       => $request->country_code ?? '+91',
             'mobile'             => $request->mobile,
@@ -77,7 +77,7 @@ class AlternativeAddressApiController extends Controller
 
         $request->validate([
             'name'               => 'required|string|max:255',
-            'gmail'             => 'nullable|email|max:255',
+            'email'             => 'nullable|email|max:255',
             'country_code'       => 'required|string|max:5',
             'mobile'             => 'required|string|max:20',
             'alternative_mobile' => 'nullable|string|max:20',
@@ -90,7 +90,7 @@ class AlternativeAddressApiController extends Controller
 
         $address->update([
             'name'               => $request->name,
-            'gmail'             => $request->gmail,
+            'email'             => $request->email,
             'country_code'       => $request->country_code ?? '+91',
             'mobile'             => $request->mobile,
             'alternative_mobile' => $request->alternative_mobile,
