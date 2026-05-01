@@ -9,7 +9,8 @@
             <h4 class="mb-sm-0 font-size-18">All Zodiac Signs</h4>
 
             <div class="page-title-right">
-                <a href="javascript:void(0);" data-href="{{ route('admin.zodiac_signs.create.index') }}" class="btn btn-soft-info waves-effect waves-light open-remote-modal">
+                <a href="javascript:void(0);" data-href="{{ route('admin.zodiac_signs.create.index') }}"
+                    class="btn btn-soft-info waves-effect waves-light open-remote-modal">
                     <i class="fas fa-plus"></i> Create
                 </a>
             </div>
@@ -34,10 +35,10 @@
                         <label class="form-label fw-bold">Zodiac</label>
                         <select id="zodiac_id" class="form-control select2-class2" data-placeholder="Select Zodiac">
                             @foreach(\App\Models\ZodiacSign::all() as $zodiac)
-                                <option value=""></option>
-                                <option value="{{ $zodiac->id }}">
-                                    {{ $zodiac->name }}
-                                </option>
+                            <option value=""></option>
+                            <option value="{{ $zodiac->id }}">
+                                {{ $zodiac->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -98,78 +99,79 @@
 
 @section('script')
 <script>
-    $(function () {
+$(function() {
 
-        const reloadTable = () => {
-            $('#data-table').DataTable().ajax.reload();
-        };
+    const reloadTable = () => {
+        $('#data-table').DataTable().ajax.reload();
+    };
 
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('admin.zodiac_signs.list') }}",
-                data: function (d) {
-                    d.zodiac_id = $('#zodiac_id').val();
-                    d.status = $('#status').val();
+    $('#data-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('admin.zodiac_signs.list') }}",
+            data: function(d) {
+                d.zodiac_id = $('#zodiac_id').val();
+                d.status = $('#status').val();
+            }
+        },
+        columns: [{
+                data: 'icon',
+                name: 'icon',
+                orderable: false,
+                searchable: false,
+                render: function(data) {
+                    if (!data) {
+                        return '<span class="text-muted">N/A</span>';
+                    }
+
+                    return `<img src="${data}" width="30" height="30" style="object-fit:contain;" />`;
                 }
             },
-            columns: [
-                {
-                    data: 'icon',
-                    name: 'icon',
-                    orderable: false,
-                    searchable: false,
-                    render: function (data) {
-                        if (!data) {
-                            return '<span class="text-muted">N/A</span>';
-                        }
-
-                        return `<img src="${data}" width="30" height="30" style="object-fit:contain;" />`;
-                    }
-                },
-                { data: 'name', name: 'name' },
-                { data: 'slug', name: 'slug' },
-                {
-                    data: 'status_text',
-                    name: 'status',
-                    className: 'text-center'
-                },
-                {
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        return `
-                            @if (Can::is_accessible('zodiac_signs', 'update'))
+            {
+                data: 'name',
+                name: 'name'
+            },
+            {
+                data: 'slug',
+                name: 'slug'
+            },
+            {
+                data: 'status_text',
+                name: 'status',
+                className: 'text-center'
+            },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function(data, type, row) {
+                    return `
                                 <a href="javascript:void(0);" data-href="{{ route('admin.zodiac_signs.update.index') }}/${row.id}" class="btn btn-soft-info btn-sm waves-effect waves-light open-remote-modal">
                                     <i class="bx bx-pencil font-size-16"></i>
                                 </a>
-                            @endif
 
-                            @if (Can::is_accessible('zodiac_signs', 'delete'))
                                 <button class="btn btn-soft-danger btn-sm delete-entry"
                                     data-href="{{ route('admin.zodiac_signs.delete') }}/${row.id}">
                                     <i class="bx bx-trash"></i>
                                 </button>
-                            @endif
                         `;
-                    }
                 }
-            ]
-        });
-
-        $('#zodiac_id, #status').on('change', function () {
-            reloadTable();
-        });
-
-        $('#reset-filter-btn').on('click', function () {
-            $('#zodiac_id').val('').trigger('change');
-            $('#status').val('1').trigger('change');
-            reloadTable();
-        });
-
+            }
+        ]
     });
+
+    $('#zodiac_id, #status').on('change', function() {
+        reloadTable();
+    });
+
+    $('#reset-filter-btn').on('click', function() {
+        $('#zodiac_id').val('').trigger('change');
+        $('#status').val('1').trigger('change');
+        reloadTable();
+    });
+
+});
 </script>
 @endsection

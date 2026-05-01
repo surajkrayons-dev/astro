@@ -31,6 +31,18 @@ class BlogController extends AdminController
             ->addColumn('category_name', function ($row) {
                 return $row->category?->name ?? '-';
             })
+            ->editColumn('name', function ($row) {
+                $words = explode(' ', $row->name);
+                return count($words) > 5
+                    ? implode(' ', array_slice($words, 0, 5)) . '...'
+                    : $row->name;
+            })
+            ->editColumn('slug', function ($row) {
+                $words = explode('-', $row->slug);
+                return count($words) > 5
+                    ? implode('-', array_slice($words, 0, 5)) . '...'
+                    : $row->slug;
+            })
             ->make();
     }
 

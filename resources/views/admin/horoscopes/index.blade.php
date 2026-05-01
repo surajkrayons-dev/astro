@@ -8,13 +8,11 @@
         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
             <h4 class="mb-sm-0 font-size-18">All Horoscopes</h4>
 
-            @if (Can::is_accessible('horoscope', 'create'))
             <div class="page-title-right">
                 <a href="{{ route('admin.horoscopes.create') }}" class="btn btn-soft-info">
                     <i class="fas fa-plus"></i> Create
                 </a>
             </div>
-            @endif
         </div>
     </div>
 </div>
@@ -180,13 +178,9 @@ $(function() {
                 className: 'text-center',
                 render: function(data, type, row) {
                     return `
-                            @if (Can::is_accessible('horoscope', 'update'))
                                 <a href="{{ route('admin.horoscopes.update.index') }}/${row.id}" class="btn btn-soft-info btn-sm waves-effect waves-light"><i class="bx bx-pencil font-size-16"></i></a>
-                            @endif
-
-                            @if (Can::is_accessible('horoscope', 'delete'))
+                                
                                 <button type="button" class="btn btn-soft-danger btn-sm waves-effect waves-light delete-entry" data-href="{{ route("admin.horoscopes.delete") }}/${row.id}" data-tbl="data"><i class="bx bx-trash font-size-16"></i></button>
-                            @endif
                         `;
                 }
             }

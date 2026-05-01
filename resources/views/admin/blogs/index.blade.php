@@ -8,13 +8,11 @@
         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
             <h4 class="mb-sm-0 font-size-18">All Blogs</h4>
 
-            @if (Can::is_accessible('blogs', 'create'))
-                <div class="page-title-right">
-                    <a href="{{ route('admin.blogs.create.index') }}" class="btn btn-soft-info">
-                        <i class="fas fa-plus"></i> Create
-                    </a>
-                </div>
-            @endif
+            <div class="page-title-right">
+                <a href="{{ route('admin.blogs.create.index') }}" class="btn btn-soft-info">
+                    <i class="fas fa-plus"></i> Create
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -34,28 +32,25 @@
 
                     <div class="col">
                         <label class="form-label fw-bold">Blog Category</label>
-                        <select id="blog_category_id"
-                                class="form-control select2-class2"
-                                data-placeholder="Select Category">
+                        <select id="blog_category_id" class="form-control select2-class2"
+                            data-placeholder="Select Category">
                             <option value=""></option>
                             @foreach(\App\Models\BlogCategory::orderBy('name')->get() as $category)
-                                <option value="{{ $category->id }}">
-                                    {{ $category->name }}
-                                </option>
+                            <option value="{{ $category->id }}">
+                                {{ $category->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="col">
                         <label class="form-label fw-bold">Blog</label>
-                        <select id="blog_id"
-                                class="form-control select2-class2"
-                                data-placeholder="Select Blog">
+                        <select id="blog_id" class="form-control select2-class2" data-placeholder="Select Blog">
                             <option value=""></option>
                             @foreach(\App\Models\Blog::orderBy('name')->get() as $blog)
-                                <option value="{{ $blog->id }}">
-                                    {{ $blog->name }}
-                                </option>
+                            <option value="{{ $blog->id }}">
+                                {{ $blog->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -89,7 +84,7 @@
 
 @section('script')
 <script>
-$(function () {
+$(function() {
 
     const reloadTable = () => {
         $('#data-table').DataTable().ajax.reload();
@@ -100,47 +95,51 @@ $(function () {
         serverSide: true,
         ajax: {
             url: "{{ route('admin.blogs.list') }}",
-            data: function (d) {
+            data: function(d) {
                 d.blog_category_id = $('#blog_category_id').val();
                 d.blog_id = $('#blog_id').val();
             }
         },
-        columns: [
-            { data: 'category_name', name: 'category.name' },
-            { data: 'name', name: 'blogs.name' },  
-            { data: 'slug', name: 'blogs.slug' },   
+        columns: [{
+                data: 'category_name',
+                name: 'category.name'
+            },
+            {
+                data: 'name',
+                name: 'blogs.name'
+            },
+            {
+                data: 'slug',
+                name: 'blogs.slug'
+            },
             {
                 data: null,
                 orderable: false,
                 searchable: false,
                 className: 'text-center',
-                render: function (data, type, row) {
+                render: function(data, type, row) {
                     return `
-                        @if (Can::is_accessible('blogs', 'update'))
                             <a href="{{ route('admin.blogs.update.index') }}/${row.id}"
                                class="btn btn-soft-info btn-sm waves-effect waves-light">
                                 <i class="bx bx-pencil font-size-16"></i>
                             </a>
-                        @endif
-
-                        @if (Can::is_accessible('blogs', 'delete'))
+                            
                             <button type="button"
                                     class="btn btn-soft-danger btn-sm waves-effect waves-light delete-entry"
                                     data-href="{{ route('admin.blogs.delete') }}/${row.id}">
                                 <i class="bx bx-trash font-size-16"></i>
                             </button>
-                        @endif
                     `;
                 }
             }
         ]
     });
 
-    $('#blog_category_id, #blog_id').on('change', function () {
+    $('#blog_category_id, #blog_id').on('change', function() {
         reloadTable();
     });
 
-    $('#reset-filter-btn').on('click', function () {
+    $('#reset-filter-btn').on('click', function() {
         $('#blog_category_id').val('').trigger('change');
         $('#blog_id').val('').trigger('change');
         reloadTable();
