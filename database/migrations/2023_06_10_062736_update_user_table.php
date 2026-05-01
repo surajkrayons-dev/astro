@@ -82,11 +82,6 @@ return new class extends Migration
 
             /* FOREIGN KEYS */
             $table->foreign('role_id')->references('id')->on('roles')->cascadeOnDelete();
-            $table->foreign('country_id')->references('id')->on('countries')->nullOnDelete();
-            $table->foreign('state_id')->references('id')->on('states')->nullOnDelete();
-            $table->foreign('city_id')->references('id')->on('cities')->nullOnDelete();
-            $table->foreign('pincode_id')->references('id')->on('pin_codes')->nullOnDelete();
-
             $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
             $table->foreign('modified_by')->references('id')->on('users')->nullOnDelete();
 
