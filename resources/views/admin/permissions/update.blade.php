@@ -32,7 +32,6 @@
             $allPermissions = [
             ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fas fa-home'],
             ['key' => 'interactions', 'label' => 'Interactions', 'icon' => 'fas fa-comments'],
-            ['key' => 'product_stocks', 'label' => 'Product Stock', 'icon' => 'fas fa-boxes'],
             ['key' => 'zodiac_signs', 'label' => 'Zodiac Signs', 'icon' => 'fas fa-star'],
             ['key' => 'horoscopes', 'label' => 'Horoscope', 'icon' => 'fas fa-moon'],
             ['key' => 'astrologers', 'label' => 'Astrologers', 'icon' => 'fas fa-user-astronaut'],
@@ -40,13 +39,7 @@
             ['key' => 'payouts', 'label' => 'Payouts', 'icon' => 'fas fa-wallet'],
             ['key' => 'blog_categories', 'label' => 'Blog Category', 'icon' => 'fas fa-layer-group'],
             ['key' => 'blogs', 'label' => 'Blogs', 'icon' => 'fas fa-blog'],
-            ['key' => 'coupons', 'label' => 'Coupons', 'icon' => 'fas fa-tags'],
-            ['key' => 'product_categories', 'label' => 'Product Category', 'icon' => 'fas fa-th-large'],
-            ['key' => 'products', 'label' => 'Products', 'icon' => 'fas fa-box'],
-            ['key' => 'orders', 'label' => 'Orders', 'icon' => 'fas fa-shopping-cart'],
-            ['key' => 'returns', 'label' => 'Returns', 'icon' => 'fas fa-undo'],
             ['key' => 'astro_banners', 'label' => 'Astro Banner', 'icon' => 'fas fa-image'],
-            ['key' => 'store_banners', 'label' => 'Store Banner', 'icon' => 'fas fa-images'],
             ['key' => 'send_mail', 'label' => 'Send Mail', 'icon' => 'fas fa-envelope'],
             ];
             @endphp

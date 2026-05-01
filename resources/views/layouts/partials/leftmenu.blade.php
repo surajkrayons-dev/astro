@@ -24,13 +24,6 @@ $user = auth()->user();
                     </a>
                 </li>
 
-                <li>
-                    <a href="{{ route('admin.product_stocks.index') }}">
-                        <i class="bx bx-package"></i>
-                        <span>Product Stock</span>
-                    </a>
-                </li>
-
                 <li class="menu-title">PERMISSIONS</li>
                 <li>
                     <a href="{{ route('admin.permissions.index') }}">
@@ -91,58 +84,12 @@ $user = auth()->user();
                     </a>
                 </li>
 
-                <li class="menu-title">Coupons & PRODUCTS</li>
-
-                <li>
-                    <a href="{{ route('admin.coupons.index') }}">
-                        <i class="bx bxs-discount"></i>
-                        <span>Coupons</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.product_categories.index') }}">
-                        <i class="bx bx-box"></i>
-                        <span>Product Category</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.products.index') }}">
-                        <i class="bx bx-collection"></i>
-                        <span>Products</span>
-                    </a>
-                </li>
-
-                <li class="menu-title">ORDERS & RETURNS</li>
-
-                <li>
-                    <a href="{{ route('admin.orders.index') }}">
-                        <i class="bx bx-cart"></i>
-                        <span>Orders</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.returns.index') }}">
-                        <i class="bx bx-undo"></i>
-                        <span>Returns</span>
-                    </a>
-                </li>
-
                 <li class="menu-title">BANNERS</li>
 
                 <li>
                     <a href="{{ route('admin.astro_banners.index') }}">
                         <i class="bx bx-image"></i>
                         <span>Astro Banner</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.store_banners.index') }}">
-                        <i class="bx bx-images"></i>
-                        <span>Store Banner</span>
                     </a>
                 </li>
 
@@ -179,15 +126,6 @@ $user = auth()->user();
                     <a href="{{ route('admin.interactions.index') }}">
                         <i class="bx bx-transfer"></i>
                         <span>Interactions</span>
-                    </a>
-                </li>
-                @endif
-
-                @if($user->hasAccess('product_stocks'))
-                <li>
-                    <a href="{{ route('admin.product_stocks.index') }}">
-                        <i class="bx bx-package"></i>
-                        <span>Product Stock</span>
                     </a>
                 </li>
                 @endif
@@ -270,62 +208,6 @@ $user = auth()->user();
                 </li>
                 @endif
 
-                {{-- PRODUCTS --}}
-                @if($user->hasAccess('coupons') || $user->hasAccess('product_categories') ||
-                $user->hasAccess('products'))
-                <li class="menu-title">Coupons & Products</li>
-                @endif
-
-                @if($user->hasAccess('coupons'))
-                <li>
-                    <a href="{{ route('admin.coupons.index') }}">
-                        <i class="bx bxs-discount"></i>
-                        <span>Coupon</span>
-                    </a>
-                </li>
-                @endif
-
-                @if($user->hasAccess('product_categories'))
-                <li>
-                    <a href="{{ route('admin.product_categories.index') }}">
-                        <i class="bx bx-box"></i>
-                        <span>Product Category</span>
-                    </a>
-                </li>
-                @endif
-
-                @if($user->hasAccess('products'))
-                <li>
-                    <a href="{{ route('admin.products.index') }}">
-                        <i class="bx bx-collection"></i>
-                        <span>Product</span>
-                    </a>
-                </li>
-                @endif
-
-                {{-- ORDERS --}}
-                @if($user->hasAccess('orders') || $user->hasAccess('returns'))
-                <li class="menu-title">ORDERS & RETURNS</li>
-                @endif
-
-                @if($user->hasAccess('orders'))
-                <li>
-                    <a href="{{ route('admin.orders.index') }}">
-                        <i class="bx bx-cart"></i>
-                        <span>Orders</span>
-                    </a>
-                </li>
-                @endif
-
-                @if($user->hasAccess('returns'))
-                <li>
-                    <a href="{{ route('admin.returns.index') }}">
-                        <i class="bx bx-undo"></i>
-                        <span>Returns</span>
-                    </a>
-                </li>
-                @endif
-
                 {{-- BANNERS --}}
                 @if($user->hasAccess('astro_banners') || $user->hasAccess('store_banners') ||
                 $user->hasAccess('send_mail'))
@@ -337,15 +219,6 @@ $user = auth()->user();
                     <a href="{{ route('admin.astro_banners.index') }}">
                         <i class="bx bx-image"></i>
                         <span>Astro Banner</span>
-                    </a>
-                </li>
-                @endif
-
-                @if($user->hasAccess('store_banners'))
-                <li>
-                    <a href="{{ route('admin.store_banners.index') }}">
-                        <i class="bx bx-store"></i>
-                        <span>Store Banner</span>
                     </a>
                 </li>
                 @endif
