@@ -86,12 +86,12 @@
                         </div>
 
                         <div class="col-md-6 mt-3">
-                            <label class="fw-bold">Love :</label>
+                            <label class="fw-bold">Love & Relationship :</label>
                             <textarea name="love" class="form-control"
                                 placeholder="Describe love & relationship predictions...">{{ $horoscope->love }}</textarea>
 
                             <div class="mt-2">
-                                <label class="fw-bold">Love Dates :</label>
+                                <label class="fw-bold">Love & Relationship Dates :</label>
                                 <input type="text" id="love_date" class="form-control"
                                     value="{{ implode(',', $horoscope->love_date ?? []) }}" placeholder="e.g. 7,18,29">
                             </div>
