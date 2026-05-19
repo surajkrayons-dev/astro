@@ -94,7 +94,7 @@ $user = auth()->user();
                 </li>
 
                 <li>
-                    <a href="{{ route('admin.send_mail.index') }}">
+                    <a href="{{ route('admin.bulk_mails.index') }}">
                         <i class="bx bx-envelope"></i>
                         <span>Send Mail</span>
                     </a>
@@ -210,7 +210,7 @@ $user = auth()->user();
 
                 {{-- BANNERS --}}
                 @if($user->hasAccess('astro_banners') || $user->hasAccess('store_banners') ||
-                $user->hasAccess('send_mail'))
+                $user->hasAccess('bulk_mails'))
                 <li class="menu-title">Banners</li>
                 @endif
 
@@ -223,9 +223,9 @@ $user = auth()->user();
                 </li>
                 @endif
 
-                @if($user->hasAccess('send_mail'))
+                @if($user->hasAccess('bulk_mails'))
                 <li>
-                    <a href="{{ route('admin.send_mail.index') }}">
+                    <a href="{{ route('admin.bulk_mails.index') }}">
                         <i class="bx bx-envelope"></i>
                         <span>Send Mail</span>
                     </a>

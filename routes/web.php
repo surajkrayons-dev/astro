@@ -473,5 +473,14 @@ Route::namespace('App\Http\Controllers\Admin')
                         Route::get('/', 'MailController@getIndex')->name('index');
                         Route::post('/send', 'MailController@sendMail')->name('send');
                     });
+
+                Route::prefix('bulk_mails')
+                    ->name('bulk_mails.')
+                    ->group(function () {
+                        Route::get('/', 'BulkMailController@getIndex')->name('index');
+                        Route::get('list', 'BulkMailController@getList')->name('list');
+                        Route::get('create', 'BulkMailController@getCreate')->name('create.index');
+                        Route::post('create', 'BulkMailController@postCreate')->name('create');
+                    });
             });
     });
