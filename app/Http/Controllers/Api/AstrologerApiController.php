@@ -374,6 +374,7 @@ class AstrologerApiController extends Controller
                 'daily_available_hours' => $astro->daily_available_hours,
                 'is_family_astrologer' => (bool) $astro->is_family_astrologer,
                 'family_astrology_details' => $astro->family_astrology_details,
+                'astro_education' => $astro->astro_education,
                 'about' => $astro->about,
                 'rating' => $astro->rating,
                 'rating_count' => $astro->rating_count,
