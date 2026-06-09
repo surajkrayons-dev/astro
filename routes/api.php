@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\StoreReviewApiController;
 use App\Http\Controllers\Api\ReturnApiController;
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Api\HoroscopeGenerateController;
+use App\Http\Controllers\Api\AiChatApiController;
 
 
 /*
@@ -161,6 +162,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('change-password', [UserApiController::class, 'changePassword']);
             Route::post('logout', [UserApiController::class, 'logout']);
             Route::delete('delete', [UserApiController::class, 'delete']);
+
+            Route::prefix('ai-chat')->group(function () {
+                Route::get('/topics', [AiChatApiController::class, 'topics']);
+                Route::post('/start-session', [AiChatApiController::class, 'startSession']);
+                Route::post('/send-message', [AiChatApiController::class, 'sendMessage']);
+                Route::get('/sessions', [AiChatApiController::class, 'sessions']);
+                Route::get('/history/{sessionId}', [AiChatApiController::class, 'history']);
+                Route::post('/close-session/{sessionId}', [AiChatApiController::class, 'closeSession']);
+            });
 
 
             /*

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             \Database\Seeders\CreateDefaultSettingsSeeder::class,
             \Database\Seeders\CreateDefaultZodiacSignsSeeder::class,
             \Database\Seeders\CreateDefaultHoroscopeSeeder::class,
+            \Database\Seeders\AiChatTopicSeeder::class,
         ]);
 
         // \App\Models\User::factory(10)->create();
