@@ -188,6 +188,20 @@ class User extends Authenticatable
     }
 
     /* =====================================================
+        AI CHAT RELATED
+    ===================================================== */
+
+    public function aiChatSessions()
+    {
+        return $this->hasMany(AiChatSession::class, 'user_id');
+    }
+
+    public function aiChatTransactions()
+    {
+        return $this->hasMany(AiChatTransaction::class, 'user_id');
+    } 
+
+    /* =====================================================
         ASTROLOGER / CLIENT RELATED
     ===================================================== */
 

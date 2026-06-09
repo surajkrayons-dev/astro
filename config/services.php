@@ -41,4 +41,13 @@ return [
         'base_url' => env('SHIPROCKET_BASE_URL'),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
+
+    'ai_chat' => [
+        'price' => env('AI_CHAT_PRICE', 1),
+        'free_messages' => env('AI_CHAT_FREE_MESSAGES', 3),
+    ],
+
 ];

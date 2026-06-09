@@ -1,0 +1,51 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('ai_chat_sessions', function (Blueprint $table) {
+
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('topic_id');
+            $table->integer('free_messages_used')->default(0);
+            $table->integer('paid_messages')->default(0);
+            $table->decimal('total_amount', 10, 2)->default(0);
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('last_message_at')->nullable();
+            $table->timestamp('closed_at')->nullable();
+            $table->enum('status', ['active', 'closed'])->default('active');
+            $table->timestamps();
+
+            $table->index('user_id');
+            $table->index('topic_id');
+            $table->index('status');
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->cascadeOnDelete();
+
+            $table->foreign('topic_id')
+                ->references('id')
+                ->on('ai_chat_topics')
+                ->cascadeOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('ai_chat_sessions');
+    }
+};
