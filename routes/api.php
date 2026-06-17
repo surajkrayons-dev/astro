@@ -31,7 +31,8 @@ use App\Http\Controllers\Api\ReturnApiController;
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Api\HoroscopeGenerateController;
 use App\Http\Controllers\Api\AiChatApiController;
-
+use App\Http\Controllers\Api\AiChatSessionApiController;
+use App\Http\Controllers\Api\AiChatTransactionApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -171,6 +172,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 Route::get('/history/{sessionId}', [AiChatApiController::class, 'history']);
                 Route::post('/close-session/{sessionId}', [AiChatApiController::class, 'closeSession']);
             });
+            
+            // AI Chat Session
+            Route::get('/chat-sessions', [AiChatSessionApiController::class, 'index']);
+            Route::get('/chat-sessions/{id}', [AiChatSessionApiController::class, 'show']);
+
+            // AI Chat Transaction
+            Route::get('/chat-transactions', [AiChatTransactionApiController::class, 'index']);
 
 
             /*
