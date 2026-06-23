@@ -32,6 +32,11 @@ class User extends Authenticatable
         'family_astrology_details',
         'daily_available_hours',
         'otp',
+        'otp_created_at',
+        'last_otp_sent_at',
+        'otp_attempts',
+        'marital_status',
+        'occupation',
 
         // ROLE & ACCESS
         'type',
@@ -45,6 +50,8 @@ class User extends Authenticatable
 
         // PROFILE DETAILS
         'dob',
+        'birth_time',
+        'birth_place',
         'gender',
         'profile_image',
 
@@ -103,6 +110,7 @@ class User extends Authenticatable
         'category' => 'array',
         'languages' => 'array',
         'is_family_astrologer' => 'boolean',
+        'traffic_sources' => 'array',
     ];
 
     /* =====================================================

@@ -9,15 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
 use App\Models\CallSession;
 use App\Models\ChatSession;
-use App\Models\AiChatSession;
-use App\Models\AiChatMessage;
-use App\Models\AiChatTopic;
-use App\Models\AiChatTransaction;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Review;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class UserApiController extends Controller
 {
@@ -25,17 +20,12 @@ class UserApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'     => 'required|string|max:255',
-            'email'    => 'nullable|email|unique:users,email',
+            'email'    => 'required|email|unique:users,email',
             'mobile'   => 'required|digits:10|unique:users,mobile',
-            'country_code' => 'nullable|string|max:5',
+            'username' => 'required|string|max:255|unique:users,username',
+            'password' => 'required|string|min:6',
             'profile_image' => 'nullable|string',
             'terms_accepted' => 'required|in:0,1',
-            'dob' => 'nullable|date',
-            'birth_time' => 'nullable|regex:/^\d{2}:\d{2}(:\d{2})?$/',
-            'birth_place' => 'nullable|string|max:255',
-            'gender' => 'nullable|in:male,female,other',
-            'marital_status' => 'nullable|string|max:100',
-            'occupation' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -45,103 +35,49 @@ class UserApiController extends Controller
             ], 422);
         }
 
-        DB::beginTransaction();
+        $user = User::create([
+            'type' => 'user',
+            'role_id' => 3,
+            'code' => $this->generateUserCode($request->name),
+            'terms_accepted' => $request->terms_accepted,
 
-        try {
+            'name' => $request->name,
+            'email' => strtolower($request->email),
+            'mobile' => $request->mobile,
+            'username' => strtolower($request->username),
+            'password' => bcrypt($request->password),
 
-            $username = $request->mobile;
-
-            if (User::where('username', $username)->exists()) {
-                $username = $request->mobile . rand(100,999);
-            }
-
-            $autoPassword = substr($request->mobile, -4) . now()->format('dmY');
-
-            $email = $request->email;
-
-            if (!$email) {
-
-                $baseEmail = strtolower(
-                    preg_replace('/[^a-zA-Z0-9]/', '', $request->name)
-                );
-
-                $email = $baseEmail . time() . rand(100,999) . '@gmail.com';
-            }
-
-            $user = User::create([
-                'type' => 'user',
-                'role_id' => 3,
-                'code' => $this->generateUserCode($request->name),
-                'terms_accepted' => $request->terms_accepted,
-
-                'name' => $request->name,
-                'email' => strtolower($email),
-                'mobile' => $request->mobile,
-                'country_code' => $request->country_code ?? '+91',
-                'username' => $username,
-                'password' => bcrypt($autoPassword),
-
-                'dob' => $request->dob,
-                'birth_time' => $request->birth_time,
-                'birth_place' => $request->birth_place,
-                'gender' => $request->gender,
-                'marital_status' => $request->marital_status,
-                'occupation' => $request->occupation,
-
-                'status' => 1,
-                'otp' => null,
-                'otp_created_at' => null,
-                'last_otp_sent_at' => null,
-                'otp_attempts' => 0,
-            ]);
-
-            if ($request->filled('profile_image')) {
-
-                $user->profile_image = $this->saveBase64Image(
-                    $request->profile_image,
-                    'user'
-                );
-
-                $user->save();
-            }
-
-            Wallet::create([
-                'user_id' => $user->id,
-                'balance' => 0,
-                'total_added' => 0,
-                'total_spent' => 0,
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Sign Up Successfully. Please login to receive OTP.',
-            ]);
-
-        } catch (\Throwable $e) {
-
-            DB::rollBack();
-
-            \Log::error('Registration Error', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Registration failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            'status' => 1,
+        ]);
+        
+        if ($request->filled('profile_image')) {
+            $user->profile_image = $this->saveBase64Image(
+                $request->profile_image,
+                'user'
+            );
+            $user->save();
         }
+
+        Wallet::create([
+            'user_id' => $user->id,
+            'balance' => 0,
+            'total_added' => 0,
+            'total_spent' => 0,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User registered successfully',
+            'token' => $user->createToken('auth_token')->plainTextToken,
+            'user' => $user->load('wallet'),
+        ]);
     }
 
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'mobile' => 'required|digits:10',
+            'username' => 'required',
+            'password' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -151,130 +87,25 @@ class UserApiController extends Controller
             ], 422);
         }
 
-        $user = User::where('mobile', $request->mobile)
-            ->where('type', 'user')
+        $user = User::where('type', 'user')
+            ->where('username', $request->username)
             ->first();
 
-        if (!$user) {
-
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Account not found',
-                'new_user' => true
-            ], 404);
+                'message' => 'Invalid username or password',
+            ], 401);
         }
 
-        if (!$user->status) {
+        if (! $user->status) {
             return response()->json([
                 'status' => false,
-                'message' => 'Account inactive',
+                'message' => 'Account is inactive',
             ], 403);
         }
 
-        if (
-            $user->last_otp_sent_at &&
-            now()->diffInSeconds($user->last_otp_sent_at) < 60
-        ) {
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Please wait before requesting another OTP',
-            ], 429);
-        }
-
-        $otp = random_int(100000, 999999);
-
         $user->update([
-            'otp' => $otp,
-            'otp_created_at' => now(),
-            'last_otp_sent_at' => now(),
-        ]);
-
-        $response = $this->sendOtpSms($request->mobile, $otp);
-
-        $responseData = $response->json();
-
-        if (
-            !$response->successful() ||
-            !isset($responseData['code']) ||
-            $responseData['code'] != '6001'
-        ) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to send OTP',
-            ], 500);
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'OTP sent successfully',
-        ]);
-    }
-
-    public function verifyLoginOtp(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'mobile' => 'required|digits:10',
-            'otp' => 'required|digits:6',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
-
-        $user = User::where('mobile', $request->mobile)
-            ->where('type', 'user')
-            ->first();
-
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'User not found',
-            ], 404);
-        }
-
-        if ($user->otp_attempts >= 5) {
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Too many wrong OTP attempts',
-            ], 429);
-        }
-
-        if ($user->otp != $request->otp) {
-
-            $user->increment('otp_attempts');
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid OTP',
-            ], 400);
-        }
-
-        if (
-            !$user->otp_created_at ||
-            \Carbon\Carbon::parse($user->otp_created_at)
-                ->diffInMinutes(now()) > 5
-        ) {
-
-            $user->update([
-                'otp' => null,
-                'otp_created_at' => null,
-            ]);
-
-            return response()->json([
-                'status' => false,
-                'message' => 'OTP expired',
-            ], 400);
-        }
-
-        $user->update([
-            'otp' => null,
-            'otp_created_at' => null,
-            'otp_attempts' => 0,
             'is_online' => 1,
             'last_seen_at' => now(),
         ]);
@@ -302,9 +133,9 @@ class UserApiController extends Controller
             ->whereDate('started_at', today())
             ->sum('amount');
 
-        $todayChat = AiChatTransaction::where('user_id', $user->id)
-            ->where('type', 'debit')
-            ->whereDate('created_at', today())
+        $todayChat = ChatSession::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->whereDate('started_at', today())
             ->sum('amount');
 
         $todayRecharge = DB::table('wallet_recharges')
@@ -317,8 +148,8 @@ class UserApiController extends Controller
             ->where('status', 'completed')
             ->sum('amount');
 
-        $totalChat = AiChatTransaction::where('user_id', $user->id)
-            ->where('type', 'debit')
+        $totalChat = ChatSession::where('user_id', $user->id)
+            ->where('status', 'completed')
             ->sum('amount');
 
         $totalRecharge = DB::table('wallet_recharges')
@@ -345,64 +176,21 @@ class UserApiController extends Controller
         });
 
         /* ================= CHAT HISTORY (PAGINATED) ================= */
-        $chatPaginator = AiChatSession::with([
-            'topic:id,name',
-            'messages:id,session_id,sender,message,is_free,charged_amount,model,tokens_used,created_at',
-            'transactions:id,user_id,session_id,message_id,amount,balance_before,balance_after,type,remark,created_at'
-        ])
-        ->where('user_id', $user->id)
-        ->latest()
-        ->paginate($perPage, ['*'], 'chat_page');
+        $chatPaginator = ChatSession::where('user_id', $user->id)
+            ->with('astrologer:id,name,code')
+            ->orderByDesc('started_at')
+            ->paginate($perPage, ['*'], 'chat_page');
 
-        $chatPaginator->getCollection()->transform(function ($session) {
-
+        $chatPaginator->getCollection()->transform(function ($c) {
             return [
-
-                'session_id' => $session->id,
-
-                'topic' => [
-                    'id' => $session->topic?->id,
-                    'name' => $session->topic?->name,
-                ],
-
-                'free_messages_used' => $session->free_messages_used,
-                'paid_messages' => $session->paid_messages,
-                'total_amount' => (float) $session->total_amount,
-
-                'status' => $session->status,
-                'started_at' => $session->started_at,
-                'last_message_at' => $session->last_message_at,
-                'closed_at' => $session->closed_at,
-
-                'messages' => $session->messages->map(function ($message) {
-
-                    return [
-                        'id' => $message->id,
-                        'sender' => $message->sender,
-                        'message' => $message->message,
-                        'is_free' => (bool) $message->is_free,
-                        'charged_amount' => (float) $message->charged_amount,
-                        'model' => $message->model,
-                        'tokens_used' => $message->tokens_used,
-                        'created_at' => $message->created_at,
-                    ];
-
-                })->values(),
-
-                'transactions' => $session->transactions->map(function ($transaction) {
-
-                    return [
-                        'id' => $transaction->id,
-                        'message_id' => $transaction->message_id,
-                        'amount' => (float) $transaction->amount,
-                        'balance_before' => (float) $transaction->balance_before,
-                        'balance_after' => (float) $transaction->balance_after,
-                        'type' => $transaction->type,
-                        'remark' => $transaction->remark,
-                        'created_at' => $transaction->created_at,
-                    ];
-
-                })->values(),
+                'id' => $c->id,
+                'astrologer_name' => $c->astrologer->name ?? null,
+                'astrologer_code' => $c->astrologer->code ?? null,
+                'started_at' => $c->started_at,
+                'ended_at' => $c->ended_at,
+                'duration_minutes' => $c->duration,
+                'amount' => (float) $c->amount,
+                'status' => $c->status,
             ];
         });
 
@@ -455,8 +243,6 @@ class UserApiController extends Controller
                 'mobile' => $user->mobile,
                 'country_code' => $user->country_code,
                 'gender' => $user->gender,
-                'marital_status' => $user->marital_status,
-                'occupation' => $user->occupation,
                 'dob' => $user->dob,
                 'birth_time' => $user->birth_time,
                 'birth_place' => $user->birth_place,
@@ -544,8 +330,6 @@ class UserApiController extends Controller
 
             'gender' => 'nullable|in:male,female,other',
             'dob' => 'nullable|date',
-            'marital_status' => 'nullable|string|max:100',
-            'occupation' => 'nullable|string|max:255',
 
             'birth_time' => 'nullable|regex:/^\d{2}:\d{2}(:\d{2})?$/',
             'birth_place' => 'nullable|string|max:255',
@@ -597,14 +381,6 @@ class UserApiController extends Controller
                 $user->birth_time = $time;
             }
 
-            if ($request->has('marital_status')) {
-                $user->marital_status = $request->marital_status;
-            }
-
-            if ($request->has('occupation')) {
-                $user->occupation = $request->occupation;
-            }
-
             if ($request->has('about'))   $user->about = $request->about;
             if ($request->has('address')) $user->address = $request->address;
             if ($request->has('pincode')) $user->pincode = $request->pincode;
@@ -654,18 +430,11 @@ class UserApiController extends Controller
         } catch (\Throwable $e) {
 
             \DB::rollBack();
-
-            \Log::error('Profile Update Error', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            \Log::error($e);
 
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to update profile',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -869,71 +638,6 @@ class UserApiController extends Controller
         ]);
     }
 
-    public function resendOtp(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'mobile' => 'required|digits:10',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
-
-        $user = User::where('mobile', $request->mobile)
-            ->where('type', 'user')
-            ->first();
-
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'User not found',
-            ], 404);
-        }
-
-        if (
-            $user->last_otp_sent_at &&
-            now()->diffInSeconds($user->last_otp_sent_at) < 60
-        ) {
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Please wait before requesting another OTP',
-            ], 429);
-        }
-
-        $otp = random_int(100000, 999999);
-
-        $user->update([
-            'otp' => $otp,
-            'otp_created_at' => now(),
-            'last_otp_sent_at' => now(),
-        ]);
-
-        $response = $this->sendOtpSms($request->mobile, $otp);
-
-        $responseData = $response->json();
-
-        if (
-            !$response->successful() ||
-            !isset($responseData['code']) ||
-            $responseData['code'] != '6001'
-        ) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to send OTP',
-                'sms_response' => $response->body(),
-            ], 500);
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'OTP resent successfully',
-        ]);
-    }
-
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -971,37 +675,5 @@ class UserApiController extends Controller
             'status' => true,
             'message' => 'Password reset successfully',
         ]);
-    }
-
-    private function sendOtpSms($mobile, $otp)
-    {
-        $message = "Dear customer, {$otp} is the OTP for your login at www.astrotring.com - Astrotring Veltex";
-
-        $params = [
-            'username'   => config('services.sms.username'),
-            'dest'       => $mobile,
-            'apikey'     => config('services.sms.api_key'),
-            'signature'  => config('services.sms.sender'),
-            'msgtype'    => 'PM',
-            'msgtxt'     => $message,
-            'entityid'   => config('services.sms.entity_id'),
-            'templateid' => config('services.sms.template_id'),
-        ];
-
-        $response = Http::timeout(30)->get(
-            config('services.sms.base_url'),
-            $params
-        );
-
-        \Log::info('SMS API REQUEST', [
-            'params' => $params,
-        ]);
-
-        \Log::info('SMS API RESPONSE', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        return $response;
     }
 }

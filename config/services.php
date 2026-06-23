@@ -41,6 +41,15 @@ return [
         'base_url' => env('SHIPROCKET_BASE_URL'),
     ],
 
+    'sms' => [
+        'base_url' => env('SMS_BASE_URL'),
+        'username' => env('SMS_USERNAME'),
+        'api_key' => env('SMS_API_KEY'),
+        'sender' => env('SMS_SENDER'),
+        'entity_id' => env('SMS_ENTITY_ID'),
+        'template_id' => env('SMS_TEMPLATE_ID'),
+    ],
+
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
     ],
