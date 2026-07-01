@@ -13,6 +13,7 @@ class AiChatMessage extends Model
 
     protected $fillable = [
         'session_id',
+        'question_id',
         'sender',
         'message',
         'is_free',
@@ -35,5 +36,10 @@ class AiChatMessage extends Model
     public function transaction()
     {
         return $this->hasOne(AiChatTransaction::class, 'message_id');
+    }
+
+    public function question()
+    {
+        return $this->belongsTo(AiAstrologerExpertiseQuestion::class, 'question_id');
     }
 }

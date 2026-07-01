@@ -13,14 +13,14 @@ class AiChatSession extends Model
 
     protected $fillable = [
         'user_id',
-        'topic_id',
-        'free_messages_used',
+        'astrologer_id',
+        'expertise_id',
         'paid_messages',
         'total_amount',
         'started_at',
         'last_message_at',
         'closed_at',
-        'status'
+        'status',
     ];
 
     protected $casts = [
@@ -30,14 +30,14 @@ class AiChatSession extends Model
         'closed_at' => 'datetime',
     ];
 
-    public function user()
+    public function astrologer()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(AiAstrologer::class, 'astrologer_id');
     }
 
-    public function topic()
+    public function expertise()
     {
-        return $this->belongsTo(AiChatTopic::class, 'topic_id');
+        return $this->belongsTo(AiAstrologerExpertise::class, 'expertise_id');
     }
 
     public function messages()
@@ -48,5 +48,10 @@ class AiChatSession extends Model
     public function transactions()
     {
         return $this->hasMany(AiChatTransaction::class, 'session_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

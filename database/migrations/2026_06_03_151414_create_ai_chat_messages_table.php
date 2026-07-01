@@ -15,6 +15,7 @@ return new class extends Migration
 
             $table->id();
             $table->unsignedBigInteger('session_id');
+            $table->unsignedBigInteger('question_id')->nullable();
             $table->enum('sender', ['user', 'assistant']);
             $table->longText('message');
             $table->boolean('is_free')->default(false);
@@ -24,12 +25,18 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('session_id');
+            $table->index('question_id');
             $table->index('sender');
 
             $table->foreign('session_id')
                 ->references('id')
                 ->on('ai_chat_sessions')
                 ->cascadeOnDelete();
+
+            $table->foreign('question_id')
+                ->references('id')
+                ->on('ai_astrologer_expertise_questions')
+                ->nullOnDelete();
         });
     }
 
