@@ -11,7 +11,6 @@ use App\Models\CallSession;
 use App\Models\ChatSession;
 use App\Models\AiChatSession;
 use App\Models\AiChatMessage;
-use App\Models\AiChatTopic;
 use App\Models\AiChatTransaction;
 use App\Models\User;
 use App\Models\Wallet;
@@ -346,8 +345,10 @@ class UserApiController extends Controller
 
         /* ================= CHAT HISTORY (PAGINATED) ================= */
         $chatPaginator = AiChatSession::with([
-            'topic:id,name',
-            'messages:id,session_id,sender,message,is_free,charged_amount,model,tokens_used,created_at',
+            'astrologer:id,name,slug,image',
+            'expertise:id,ai_astrologer_id,name,slug',
+            'messages.question:id,question',
+            'messages:id,session_id,question_id,sender,message,is_free,charged_amount,model,tokens_used,created_at',
             'transactions:id,user_id,session_id,message_id,amount,balance_before,balance_after,type,remark,created_at'
         ])
         ->where('user_id', $user->id)
@@ -360,9 +361,19 @@ class UserApiController extends Controller
 
                 'session_id' => $session->id,
 
-                'topic' => [
-                    'id' => $session->topic?->id,
-                    'name' => $session->topic?->name,
+                'astrologer' => [
+                    'id' => $session->astrologer?->id,
+                    'name' => $session->astrologer?->name,
+                    'slug' => $session->astrologer?->slug,
+                    'image' => $session->astrologer?->image
+                        ? asset('storage/aiAstrologers/'.$session->astrologer->image)
+                        : null,
+                ],
+
+                'expertise' => [
+                    'id' => $session->expertise?->id,
+                    'name' => $session->expertise?->name,
+                    'slug' => $session->expertise?->slug,
                 ],
 
                 'free_messages_used' => $session->free_messages_used,
@@ -378,6 +389,8 @@ class UserApiController extends Controller
 
                     return [
                         'id' => $message->id,
+                        'question_id' => $message->question_id,
+                        'question' => optional($message->question)->question,
                         'sender' => $message->sender,
                         'message' => $message->message,
                         'is_free' => (bool) $message->is_free,

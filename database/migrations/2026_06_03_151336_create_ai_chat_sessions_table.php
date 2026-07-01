@@ -15,7 +15,8 @@ return new class extends Migration
 
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('topic_id');
+            $table->unsignedBigInteger('astrologer_id');
+            $table->unsignedBigInteger('expertise_id');
             $table->integer('free_messages_used')->default(0);
             $table->integer('paid_messages')->default(0);
             $table->decimal('total_amount', 10, 2)->default(0);
@@ -26,7 +27,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('user_id');
-            $table->index('topic_id');
+            $table->index('astrologer_id');
+            $table->index('expertise_id');
             $table->index('status');
 
             $table->foreign('user_id')
@@ -34,9 +36,14 @@ return new class extends Migration
                 ->on('users')
                 ->cascadeOnDelete();
 
-            $table->foreign('topic_id')
+            $table->foreign('astrologer_id')
                 ->references('id')
-                ->on('ai_chat_topics')
+                ->on('ai_astrologers')
+                ->cascadeOnDelete();
+
+            $table->foreign('expertise_id')
+                ->references('id')
+                ->on('ai_astrologer_expertises')
                 ->cascadeOnDelete();
         });
     }

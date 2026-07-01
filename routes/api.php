@@ -33,6 +33,8 @@ use App\Http\Controllers\Api\HoroscopeGenerateController;
 use App\Http\Controllers\Api\AiChatApiController;
 use App\Http\Controllers\Api\AiChatSessionApiController;
 use App\Http\Controllers\Api\AiChatTransactionApiController;
+use App\Http\Controllers\Api\AiAstrologyController;
+use App\Http\Controllers\Api\AiAstrologerExpertiseQuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +43,10 @@ use App\Http\Controllers\Api\AiChatTransactionApiController;
 */
 
 Route::post('/call/webhook', [EasyGoApiController::class, 'callWebhook']);
+
+Route::get('/ai-astrologers', [AiAstrologyController::class, 'index']);
+Route::get('/ai-astrologers/{slug}', [AiAstrologyController::class, 'show']);
+Route::get('/ai-astrologer-expertise/{slug}/questions', [AiAstrologerExpertiseQuestionController::class, 'index']);
 
 // USER AUTH
 Route::prefix('user')->group(function () {
@@ -167,7 +173,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('delete', [UserApiController::class, 'delete']);
 
             Route::prefix('ai-chat')->group(function () {
-                Route::get('/topics', [AiChatApiController::class, 'topics']);
+                // Route::get('/topics', [AiChatApiController::class, 'topics']);
                 Route::post('/start-session', [AiChatApiController::class, 'startSession']);
                 Route::post('/send-message', [AiChatApiController::class, 'sendMessage']);
                 Route::get('/sessions', [AiChatApiController::class, 'sessions']);
